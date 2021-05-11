@@ -20,6 +20,4 @@ end entity;
 architecture rtl of regfile is
 begin
 
-	asdfasdf
-
 end architecture;
