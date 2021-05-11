@@ -19,5 +19,5 @@ end entity;
 
 architecture rtl of regfile is
 begin
- --hihi
+ --hihihoho
 end architecture;
