@@ -19,7 +19,4 @@ end entity;
 
 architecture rtl of regfile is
 begin
-
-	--test comment	
-
 end architecture;
