@@ -48,6 +48,7 @@ begin
 
 		if op.memread then
 			M.rd <= '1';
+			B <= '1';
 			case op.memtype is
 				when MEM_B | MEM_BU=>
 					if op.memtype = MEM_BU then
@@ -76,6 +77,7 @@ begin
 							if byte_address = "01" then
 								XL <= '1';
 								M.rd <= '0';
+								B <= '0';
 							end if;
 							R(7 downto 0) <=  D.rddata(31 downto 24);
 							R(15 downto 8) <=  D.rddata(23 downto 16);
@@ -83,6 +85,7 @@ begin
 							if byte_address = "11" then
 								XL <= '1';
 								M.rd <= '0';
+								B <= '0';
 							end if;
 							R(7 downto 0) <=  D.rddata(15 downto 8);
 							R(15 downto 8) <=  D.rddata(7 downto 0);
@@ -93,6 +96,7 @@ begin
 					if byte_address /= "00" then
 						XL <= '1';
 						M.rd <= '0';
+						B <= '0';
 					end if;
 					R(7 downto 0) <= D.rddata(31 downto 24);
 					R(15 downto 8) <= D.rddata(23 downto 16);
