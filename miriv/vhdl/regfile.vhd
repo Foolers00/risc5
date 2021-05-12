@@ -31,22 +31,30 @@ begin
 	begin
 			rddata1 <= rddata1_reg;
 			rddata2 <= rddata2_reg;
+			
+			if stall = '0' then
+				if regwrite = '1' then
+					if rdaddr1 = wraddr then
+						rddata1 <= wrdata;
+						if to_integer(unsigned(rdaddr1)) = 0 then
+							rddata1 <= (others => '0');
+						end if;
+					end if;
 
-			if regwrite = '1' and stall = '0' then
-				if rdaddr1 = wraddr then
-					rddata1 <= wrdata;
+					if rdaddr2 = wraddr then
+						rddata2 <= wrdata;
+						if to_integer(unsigned(rdaddr2)) = 0 then
+							rddata2 <= (others => '0');
+						end if;
+					end if;
 				end if;
 
-				if rdaddr2 = wraddr then
-					rddata2 <= wrdata;
-				end if;
-			end if;
-
-			if to_integer(unsigned(rdaddr1)) = 0 then
-				rddata1 <= (others => '0');
-			end if;
-			if to_integer(unsigned(rdaddr2)) = 0 then
-				rddata2 <= (others => '0');
+				--if to_integer(unsigned(rdaddr1)) = 0 then
+				--	rddata1 <= (others => '0');
+				--end if;
+				--if to_integer(unsigned(rdaddr2)) = 0 then
+				--	rddata2 <= (others => '0');
+				--end if;
 			end if;
 
 	end process;
@@ -56,16 +64,33 @@ begin
 			if (res_n = '0') then
 				rddata1_reg <= (others => '0');
 				rddata2_reg <= (others => '0');
+				reg(0) <= (others => '0');
 
 			elsif rising_edge(clk) then
+				if stall = '0' then
+					rddata1_reg <= reg(to_integer(unsigned(rdaddr1)));
+					rddata2_reg <= reg(to_integer(unsigned(rdaddr2)));
 
-				rddata1_reg <= reg(to_integer(unsigned(rdaddr1)));
-				rddata2_reg <= reg(to_integer(unsigned(rdaddr2)));
-
-				if regwrite = '1' and stall = '0' then
-					reg(to_integer(unsigned(wraddr))) <= wrdata;
+					if regwrite = '1' then
+						if to_integer(unsigned(wraddr)) /= 0 then -- x0 needs to stay 0
+							reg(to_integer(unsigned(wraddr))) <= wrdata;
+						end if;
+						-- set output registers immediatly to new values when a bypass ocurrs
+						-- to make sure the output registers contain their value even if the address changes with next rising edge
+						if wraddr = rdaddr1 then
+							rddata1_reg <= wrdata;
+							if to_integer(unsigned(rdaddr1)) = 0 then
+								rddata1_reg <= (others => '0');
+							end if;
+						end if;
+						if wraddr = rdaddr2 then
+							rddata2_reg <= wrdata;
+							if to_integer(unsigned(rdaddr2)) = 0 then
+								rddata2_reg <= (others => '0');
+							end if;
+						end if;
+					end if;
 				end if;
-
 			end if;
 	end process;
 
