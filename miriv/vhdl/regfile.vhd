@@ -31,7 +31,7 @@ begin
 	begin
 			rddata1 <= rddata1_reg;
 			rddata2 <= rddata2_reg;
-			
+
 			if stall = '0' then
 				if regwrite = '1' then
 					if rdaddr1 = wraddr then
@@ -48,13 +48,6 @@ begin
 						end if;
 					end if;
 				end if;
-
-				--if to_integer(unsigned(rdaddr1)) = 0 then
-				--	rddata1 <= (others => '0');
-				--end if;
-				--if to_integer(unsigned(rdaddr2)) = 0 then
-				--	rddata2 <= (others => '0');
-				--end if;
 			end if;
 
 	end process;
