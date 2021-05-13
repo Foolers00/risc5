@@ -59,7 +59,6 @@ begin
 
 			when ALU_SRA =>
 				temp_var := A;
-				report integer'IMAGE(to_integer(unsigned(B(4 downto 0)))-1);
 				for i in 0 to to_integer(unsigned(B(4 downto 0)))-1 loop
 					temp_var := std_logic_vector(shift_right(unsigned(temp_var), 1));
 					temp_var(temp_var'length-1) := A(A'length-1);
@@ -70,8 +69,9 @@ begin
 				R <= std_logic_vector(signed(A) + signed(B));
 			
 			when ALU_SUB =>
-				R <= std_logic_vector(signed(A) - signed(B));
-				if signed(A) = signed(B) then
+				temp_var := std_logic_vector(signed(A) - signed(B))
+				R <= temp_var;
+				if to_integer(unsigned(temp_var)) = 0 then
 					Z <= '1';
 				else
 					Z <= '0';
