@@ -32,6 +32,18 @@ package core_pkg is
 	constant ZERO_PC          : pc_type      := (others => '0');
 	constant NOP_INST         : instr_type   := X"00000013";
 
+	--opcodes
+	constant OPC_BITS : integer := 7;
+	constant OPC_LUI : std_logic_vector(OPC_BITS - 1 downto 0) := "0110111";
+	constant OPC_AUIPC : std_logic_vector(OPC_BITS - 1 downto 0) := "0010111";
+	constant OPC_OP : std_logic_vector(OPC_BITS - 1 downto 0) := "0110011";
+	constant OPC_OP_IMM : std_logic_vector(OPC_BITS - 1 downto 0) := "0010011";
+	constant OPC_JAL : std_logic_vector(OPC_BITS - 1 downto 0) := "1101111";
+	constant OPC_JALR : std_logic_vector(OPC_BITS - 1 downto 0) := "1100111";
+	constant OPC_BRANCH : std_logic_vector(OPC_BITS - 1 downto 0) := "1100011";
+	constant OPC_STORE : std_logic_vector(OPC_BITS - 1 downto 0) := "0100011";
+	constant OPC_LOAD : std_logic_vector(OPC_BITS - 1 downto 0) := "0000011";
+
 	pure function to_data_type(pc : pc_type) return data_type;
 	pure function to_pc_type(data : data_type) return pc_type;
 
