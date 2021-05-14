@@ -69,7 +69,7 @@ begin
 				R <= std_logic_vector(signed(A) + signed(B));
 			
 			when ALU_SUB =>
-				temp_var := std_logic_vector(signed(A) - signed(B))
+				temp_var := std_logic_vector(signed(A) - signed(B));
 				R <= temp_var;
 				if to_integer(unsigned(temp_var)) = 0 then
 					Z <= '1';
