@@ -39,57 +39,103 @@ architecture rtl of fetch is
 
 	constant pc_add : pc_type := (2 => '1', others => '0');
 
-	signal pc_counter, pc_counter_next : pc_type := (others => '0');
+	signal pc_counter_reg, pc_counter_reg_next : pc_type := (others => '0');
+	signal pcsrc_reg, pcsrc_reg_next : std_logic;
+	signal pc_in_reg, pc_in_reg_next : pc_type;
+	signal pc_out_reg, pc_out_reg_next : pc_type;
+	signal instr_reg, instr_reg_next : instr_type;
+	signal mem_in_reg, mem_in_reg_next : mem_in_type;
+	signal mem_out_reg, mem_out_reg_next : mem_out_type;
+	signal mem_busy_reg, mem_busy_reg_next : std_logic;
+	signal stall_reg, stall_reg_next : std_logic;
+	signal flush_reg, flush_reg_next : std_logic;
+
 
 begin
 
 
 	sync : process (clk, res_n)
-	variable current_pc : pc_type;
 	begin
-		current_pc := pc_counter_next;
 		if not res_n then
-			pc_out <= ZERO_PC;
-			instr <= mem_in.rddata;
-			mem_out <= MEM_OUT_FETCH_RES;
-			mem_busy <= '0';
-			pc_counter <= ZERO_PC;
+			pc_in_reg <= ZERO_PC;
+			pc_out_reg <= ZERO_PC;
+			pcsrc_reg <= '0';
+			instr_reg <= mem_in.rddata;
+			mem_in_reg <= MEM_IN_NOP;
+			mem_out_reg <= MEM_OUT_FETCH_RES;
+			mem_busy_reg <= '0';
+			pc_counter_reg <= ZERO_PC;
+			stall_reg <= '0';
+			flush_reg <= '0';
 		elsif rising_edge(clk) then
-			mem_busy <= '0';
-			mem_out <= MEM_OUT_FETCH_RES;
-			pc_counter <= pc_counter_next;
-			if not stall then 
-				if flush then
-					instr <= NOP_INST;
-				else
-					if pcsrc then
-						current_pc:= pc_in;
-					else
-						current_pc := std_logic_vector(unsigned(pc_counter_next) + unsigned(pc_add));
-					end if;
-					pc_out <= current_pc;
-					pc_counter <= current_pc;
-					
-					if mem_in.busy then
-						mem_busy <= '1';
-					end if;
-					instr(7 downto 0) <= mem_in.rddata(31 downto 24);
-					instr(15 downto 8) <= mem_in.rddata(23 downto 16);
-					instr(23 downto 16) <= mem_in.rddata(15 downto 8);
-					instr(31 downto 24) <= mem_in.rddata(7 downto 0);
-				
-					mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
-					mem_out.rd <= '1';
-					
-
-				end if;
-			end if;
+			mem_busy_reg <= mem_busy_reg_next;
+			mem_out_reg <= mem_out_reg_next;
+			pc_counter_reg <= pc_counter_reg_next;
+			pc_out_reg <= pc_out_reg_next;
+			pc_in_reg <= pc_in_reg_next;
+			instr_reg <= instr_reg_next;
+			mem_in_reg <= mem_in_reg_next;
+			pcsrc_reg <= pcsrc_reg_next;
+			flush_reg <= flush_reg_next;
+			stall_reg <= stall_reg_next;
+			
 		end if;
 	end process;
 
-	pc_reg : process (all)
+
+	output : process (all)
 	begin
-		pc_counter_next <= pc_counter;
+		pc_out <= pc_out_reg;
+		instr <= instr_reg;
+		mem_out <= mem_out_reg;
+		mem_busy <= mem_busy_reg;
+		
+	end process;
+
+	pc_reg : process (all)
+	variable current_pc : pc_type;
+	begin
+		pc_counter_reg_next <= pc_counter_reg;
+		pc_in_reg_next <= pc_in;
+		pc_out_reg_next <= pc_out_reg;
+		pcsrc_reg_next <= pcsrc;
+		instr_reg_next <= instr_reg;
+		mem_in_reg_next <= mem_in;
+		mem_out_reg_next <= mem_out_reg;
+		mem_out_reg_next.rd <= '0';
+		mem_busy_reg_next <= '0';
+		flush_reg_next <= flush;
+		stall_reg_next <= stall;
+
+		current_pc := pc_counter_reg;
+
+	
+		if not stall_reg then 
+			if flush_reg then
+				instr_reg_next <= NOP_INST;
+			else
+				if pcsrc_reg then
+					current_pc:= pc_in_reg;
+				else
+					current_pc := std_logic_vector(unsigned(pc_counter_reg) + unsigned(pc_add));
+				end if;
+				pc_out_reg_next <= current_pc;
+				pc_counter_reg_next <= current_pc;
+				
+				if mem_in_reg.busy then
+					mem_busy_reg_next <= '1';
+				end if;
+				instr_reg_next(7 downto 0) <= mem_in_reg.rddata(31 downto 24);
+				instr_reg_next(15 downto 8) <= mem_in_reg.rddata(23 downto 16);
+				instr_reg_next(23 downto 16) <= mem_in_reg.rddata(15 downto 8);
+				instr_reg_next(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
+			
+				mem_out_reg_next.address <= current_pc(ADDR_WIDTH+1 downto 2);
+				mem_out_reg_next.rd <= '1';
+				
+
+			end if;
+		end if;
 
 	end process;
 end architecture;

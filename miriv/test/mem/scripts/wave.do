@@ -23,6 +23,22 @@ add wave -noupdate /mem_tb/pc_new_out
 add wave -noupdate /mem_tb/wbop_in
 add wave -noupdate /mem_tb/wbop_out
 add wave -noupdate /mem_tb/reg_write
+add wave -noupdate /mem_tb/mem_inst/aluresult_reg
+add wave -noupdate /mem_tb/mem_inst/exc_load_reg
+add wave -noupdate /mem_tb/mem_inst/exc_store_reg
+add wave -noupdate /mem_tb/mem_inst/flush_reg
+add wave -noupdate /mem_tb/mem_inst/mem_busy_reg
+add wave -noupdate /mem_tb/mem_inst/mem_in_reg
+add wave -noupdate /mem_tb/mem_inst/mem_op_reg
+add wave -noupdate /mem_tb/mem_inst/mem_out_reg
+add wave -noupdate /mem_tb/mem_inst/memresult_reg
+add wave -noupdate /mem_tb/mem_inst/pc_new_reg
+add wave -noupdate /mem_tb/mem_inst/pc_old_reg
+add wave -noupdate /mem_tb/mem_inst/pcsrc_reg
+add wave -noupdate /mem_tb/mem_inst/stall_reg
+add wave -noupdate /mem_tb/mem_inst/wbop_reg
+add wave -noupdate /mem_tb/mem_inst/wrdata_reg
+add wave -noupdate /mem_tb/mem_inst/zero_reg
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {51 ps} 0}
 quietly wave cursor active 1
@@ -40,4 +56,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {1 ns}
+WaveRestoreZoom {9999050 ps} {10000050 ps}

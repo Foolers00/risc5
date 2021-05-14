@@ -37,4 +37,15 @@ end entity;
 
 architecture rtl of exec is
 begin
+
+	sync : process (clk, res_n)
+	begin
+		if not res_n then
+			
+		elsif rising_edge(clk) then
+
+		end if;
+	end process;
+
+
 end architecture;
