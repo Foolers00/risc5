@@ -55,6 +55,44 @@ architecture rtl of decode is
 	constant OPC_STORE : std_logic_vector(OPC_BITS - 1 downto 0) := "0100011";
 	constant OPC_LOAD : std_logic_vector(OPC_BITS - 1 downto 0) := "0000011";
 
+	procedure decode_imm_I_type (
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
+	begin
+		imm(31 downto 11) <= (others => instr(31));
+		imm(10 downto 0) <= instr(30 downto 20);
+	end procedure;
+
+	procedure decode_imm_B_type (
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
+	begin
+		imm(31 downto 12) <= (others => instr(31));
+		imm(11) <= instr(7);
+		imm(10 downto 5) <= instr(30 downto 25);
+		imm(4 downto 1) <= instr(11 downto 8);
+		imm(0) <= '0';
+	end procedure;
+
+	procedure decode_imm_U_type (
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
+	begin
+		imm(31 downto 12) <= instr(31 downto 12);
+	end procedure;
+
+	procedure decode_imm_J_type (
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
+	begin
+		imm(31 downto 20) <= (others => instr(31));
+		imm(19 downto 12) <= instr(19 downto 12);
+		imm(11) <= instr(20);
+		imm(10 downto 1) <= instr(30 downto 21);
+		imm(0) <= '0';
+	end procedure;
+
+
 	-- ******* meaning of alusrc{1..3} +**************
 	-- alusrc1 switches input A of ALU between rs1 (alusrc1 = 0) and PC (alusrc1 = 1)
 	-- alusrc2 switchtes input B of ALU between rs2 (alusrc2 = 0) and immediate value (alusrc2 = 1)
@@ -92,7 +130,7 @@ begin
 			exec_op.readdata1 <= regfile_rddata1;
 			exec_op.readdata2 <= regfile_rddata2;
 
-			-- destination register is always propagated to wb stage
+			-- destination register is propagated to wb stage per default
 			wb_op.rd <= instr_reg(11 downto 7);
 
 			--set default values
@@ -102,13 +140,14 @@ begin
 
 
 			when OPC_LUI =>
+				--LUI
 				exec_op.aluop <= ALU_NOP; -- NOP propagates input B to output
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '1'; -- take immediate value for B input of ALU
 				exec_op.alusrc3 <= '0';
 				exec_op.rs1 <= ZERO_REG;
 				exec_op.rs2 <= ZERO_REG;
-				exec_op.imm(31 downto 12) <= instr_reg(31 downto 12);
+				decode_imm_U_type(instr_reg,exec_op.imm);
 
 				mem_op <= MEM_NOP;
 
@@ -117,13 +156,14 @@ begin
 
 
 			when OPC_AUIPC =>
+				--AUIPC
 				exec_op.aluop <= ALU_ADD;
 				exec_op.alusrc1 <= '1'; -- choose PC for input A
 				exec_op.alusrc2 <= '1'; -- choose imm for input B
 				exec_op.alusrc3 <= '0';
 				exec_op.rs1 <= ZERO_REG;
 				exec_op.rs2 <= ZERO_REG;
-				exec_op.imm(31 downto 12) <= instr_reg(31 downto 12);
+				decode_imm_U_type(instr_reg, exec_op.imm);
 
 				mem_op <= MEM_NOP;
 
@@ -131,17 +171,14 @@ begin
 				wb_op.src <= WBS_ALU;
 
 			when OPC_JAL =>
+				--JAL
 				exec_op.aluop <= ALU_NOP;
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '0';
 				exec_op.alusrc3 <= '0'; -- set PC adder to add imm and pc
 				exec_op.rs1 <= ZERO_REG;
 				exec_op.rs2 <= ZERO_REG;
-				exec_op.imm(31 downto 20) <= (others => instr_reg(31));
-				exec_op.imm(19 downto 12) <= instr_reg(19 downto 12);
-				exec_op.imm(11) <= instr_reg(20);
-				exec_op.imm(10 downto 1) <= instr_reg(30 downto 21);
-				exec_op.imm(0) <= '0';
+				decode_imm_J_type(instr_reg, exec_op.imm);
 
 				mem_op <= MEM_NOP;
 
@@ -149,14 +186,14 @@ begin
 				wb_op.src <= WBS_OPC;
 
 			when OPC_JALR =>
+				--JALR
 				exec_op.aluop <= ALU_NOP;
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '0';
 				exec_op.alusrc3 <= '1'; -- set PC adder to add imm and rs1
 				exec_op.rs1 <= ZERO_REG;
 				exec_op.rs2 <= ZERO_REG;
-				exec_op.imm(31 downto 11) <= (others => instr_reg(31));
-				exec_op.imm(10 downto 0) <= instr_reg(30 downto 20);
+				decode_imm_I_type(instr_reg,exec_op.imm);
 
 				mem_op <= MEM_NOP;
 
@@ -164,34 +201,59 @@ begin
 				wb_op.src <= WBS_OPC;
 
 			when OPC_BRANCH =>
+				exec_op.alusrc1 <= '0';
+				exec_op.alusrc2 <= '0';
+				exec_op.alusrc3 <= '0';-- set PC adder to add imm and old pc
+				decode_imm_B_type(instr_reg, exec_op.imm);
+
+				mem_op.mem <= MEMU_NOP;
+
+				wb_op <= WB_NOP;
+
 				case instr_reg(14 downto 12) is
-
 					when "000" =>
+						--BEQ
 						exec_op.aluop <= ALU_SUB;
-						exec_op.alusrc1 <= '0';
-						exec_op.alusrc2 <= '0';
-						exec_op.alusrc3 <= '0';-- set PC adder to add imm and old pc
-						exec_op.imm(31 downto 12) <= (others => instr_reg(31));
-						exec_op.imm(11) <= instr_reg(7);
-						exec_op.imm(10 downto 5) <= instr_reg(30 downto 25);
-						exec_op.imm(4 downto 1) <= instr_reg(11 downto 8);
-						exec_op.imm(0) <= '0';
-
 						mem_op.branch <= BR_CND;
-						mem_op.mem <= MEMU_NOP;
 
+					when "001" =>
+						--BNE
+						exec_op.aluop <= ALU_SUB;
+						mem_op.branch <= BR_CNDI;
 
+					when "100" =>
+						--BLT
+						exec_op.aluop <= ALU_SLT;
+						mem_op.branch <= BR_CND;
 
+					when "101" =>
+						--BGE
+						exec_op.aluop <= ALU_SLT;
+						mem_op.branch <= BR_CNDI;
 
+					when "110" =>
+						--BLTU
+						exec_op.aluop <= ALU_SLTU;
+						mem_op.branch <= BR_CND;
 
-
-
-
-					when others =>
-
+					when "111" =>
+						--BGEU
+						exec_op.aluop <= ALU_SLTU;
+						mem_op.branch <= BR_CNDI;
+					when others => null;
 				end case;
 
-			when others =>
+			when OPC_LOAD =>
+			--set alu to add rs1 with imm
+			exec_op.alusrc1 <= '0';
+			exec_op.alusrc2 <= '1';
+			exec_op.alusrc2 <= '0'; -- don't care
+			decode_imm_I_type(instr_reg, exec_op.imm);
+
+			wb_op.write <= '1';
+			wb_op.src <= WBS_ALU;
+
+			when others => null;
 
 		end case;
 
