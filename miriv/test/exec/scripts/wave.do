@@ -4,8 +4,6 @@ add wave -noupdate /exec_tb/clk
 add wave -noupdate /exec_tb/res_n
 add wave -noupdate /exec_tb/stall
 add wave -noupdate /exec_tb/flush
-add wave -noupdate /exec_tb/exec_inst/stall_reg
-add wave -noupdate /exec_tb/exec_inst/flush_reg
 add wave -noupdate /exec_tb/op
 add wave -noupdate /exec_tb/aluresult
 add wave -noupdate /exec_tb/memop_in
@@ -17,15 +15,13 @@ add wave -noupdate /exec_tb/wbop_in
 add wave -noupdate /exec_tb/wbop_out
 add wave -noupdate /exec_tb/wrdata
 add wave -noupdate /exec_tb/zero
-add wave -noupdate /exec_tb/exec_inst/aluresult_reg
 add wave -noupdate /exec_tb/exec_inst/exec_op_reg
 add wave -noupdate /exec_tb/exec_inst/mem_op_reg
 add wave -noupdate /exec_tb/exec_inst/pc_add_A_reg
 add wave -noupdate /exec_tb/exec_inst/pc_add_B_reg
-add wave -noupdate /exec_tb/exec_inst/pc_new_reg
 add wave -noupdate /exec_tb/exec_inst/pc_old_reg
 add wave -noupdate /exec_tb/exec_inst/wbop_reg
-add wave -noupdate /exec_tb/exec_inst/zero_reg
+add wave -noupdate /exec_tb/exec_inst/temp_pc_new_out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {51 ps} 0}
 quietly wave cursor active 1

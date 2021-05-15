@@ -51,14 +51,11 @@ architecture rtl of exec is
 	signal wbop_reg, wbop_reg_next : wb_op_type;
 	signal mem_op_reg, mem_op_reg_next : mem_op_type;
 	signal pc_old_reg, pc_old_reg_next : pc_type;
-	signal pc_new_reg, pc_new_reg_next : data_type;
+	signal temp_pc_new_out : data_type;
 	signal exec_op_reg, exec_op_reg_next : exec_op_type;
-	signal aluresult_reg, aluresult_reg_next : data_type;
-	signal zero_reg, zero_reg_next : std_logic;
 	signal pc_add_A_reg, pc_add_A_reg_next : data_type;
 	signal pc_add_B_reg, pc_add_B_reg_next : data_type;
-	signal stall_reg, stall_reg_next : std_logic;
-	signal flush_reg, flush_reg_next : std_logic;
+	
 
 
 begin
@@ -69,8 +66,8 @@ begin
 		op => exec_op_reg.aluop,
 		A => exec_op_reg.readdata1,
 		B => exec_op_reg.readdata2,
-		R => aluresult_reg_next,
-		Z => zero_reg_next
+		R => aluresult,
+		Z => zero
 	);
 
 	alu_inst2 : alu
@@ -78,7 +75,7 @@ begin
 		op => ALU_ADD,
 		A => pc_add_A_reg,
 		B => pc_add_B_reg,
-		R => pc_new_reg_next,
+		R => temp_pc_new_out,
 		Z => open
 	);
 
@@ -88,77 +85,66 @@ begin
 			wbop_reg <= WB_NOP;
 			mem_op_reg <= MEM_NOP;
 			pc_old_reg <= ZERO_PC;
-			pc_new_reg <= ZERO_DATA;
 			exec_op_reg <= EXEC_NOP;
-			aluresult_reg <= ZERO_DATA;
 			pc_add_A_reg <= ZERO_DATA;
 			pc_add_B_reg <= ZERO_DATA;
-			zero_reg <= '0';
-			stall_reg <= '0';
-			flush_reg <= '0';
 		elsif rising_edge(clk) then
 			wbop_reg <= wbop_reg_next;
 			mem_op_reg <= mem_op_reg_next;
 			pc_old_reg <= pc_old_reg_next;
-			pc_new_reg <= pc_new_reg_next;
 			exec_op_reg <= exec_op_reg_next;
-			aluresult_reg <= aluresult_reg_next;
 			pc_add_A_reg <= pc_add_A_reg_next;
-			pc_add_B_reg <= pc_add_B_reg_next;
-			zero_reg <= zero_reg_next;
-			stall_reg <= stall_reg_next;
-			flush_reg <= flush_reg_next;	
+			pc_add_B_reg <= pc_add_B_reg_next;	
 		end if;
 	end process;
 
-	output : process (all)
-	begin
-		wbop_out <= wbop_reg;
-		memop_out <= mem_op_reg;
-		pc_old_out <= pc_old_reg;
-		pc_new_out <= to_pc_type(data => pc_new_reg);
-		aluresult <= aluresult_reg;
-		wrdata <= ZERO_DATA;
-		zero <= zero_reg;
 
-	end process;
 
 	alu_reg : process (all)
 	begin
-		wbop_reg_next <= wbop_reg;
-		mem_op_reg_next <= mem_op_reg;
-		pc_old_reg_next <= pc_old_reg;
-		exec_op_reg_next <= exec_op_reg;
-		stall_reg_next <= stall;
-		flush_reg_next <= flush;
+		-- New Register Input
+		wbop_reg_next <= wbop_in;
+		mem_op_reg_next <= memop_in;
+		pc_old_reg_next <= pc_in;
+		exec_op_reg_next <= op;
+
+		-- Output
+		wbop_out <= wbop_reg;
+		memop_out <= mem_op_reg;
+		pc_old_out <= pc_old_reg;
+		pc_new_out <= to_pc_type(data => temp_pc_new_out);
+		wrdata <= ZERO_DATA;
 		
-		if not stall_reg then
-			if flush_reg then
-				wbop_reg_next <= WB_NOP;
-				mem_op_reg_next <= MEM_NOP;
-				pc_old_reg_next <= ZERO_PC;
-				exec_op_reg_next <= EXEC_NOP;
-			else
-				wbop_reg_next <= wbop_in;
-				mem_op_reg_next <= memop_in;
-				pc_old_reg_next <= pc_in;
-				exec_op_reg_next <= op;
+		if flush then
+			wbop_reg_next <= WB_NOP;
+			mem_op_reg_next <= MEM_NOP;
+			pc_old_reg_next <= ZERO_PC;
+			exec_op_reg_next <= EXEC_NOP;
 
-				if op.alusrc1 then
-					exec_op_reg_next.readdata1 <= to_data_type(pc => pc_in);
-				end if;
+		else
 
-				if op.alusrc2 then
-					exec_op_reg_next.readdata2 <= op.imm;
-				end if;
-
-				pc_add_A_reg_next <= std_logic_vector(shift_left(unsigned(op.imm), 1));
-				pc_add_B_reg_next <= to_data_type(pc => pc_in);
-				if op.alusrc3 then
-					pc_add_B_reg_next <= op.readdata1;
-				end if;
-
+			if op.alusrc1 then
+				exec_op_reg_next.readdata1 <= to_data_type(pc => pc_in);
 			end if;
+
+			if op.alusrc2 then
+				exec_op_reg_next.readdata2 <= op.imm;
+			end if;
+
+			pc_add_A_reg_next <= std_logic_vector(shift_left(unsigned(op.imm), 1));
+			pc_add_B_reg_next <= to_data_type(pc => pc_in);
+			if op.alusrc3 then
+				pc_add_B_reg_next <= op.readdata1;
+			end if;
+
+			-- Old Register Input
+			if stall then
+				wbop_reg_next <= wbop_reg;
+				mem_op_reg_next <= mem_op_reg;
+				pc_old_reg_next <= pc_old_reg;
+				exec_op_reg_next <= exec_op_reg;
+			end if;
+			
 		end if;
 
 	end process;
