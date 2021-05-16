@@ -92,6 +92,15 @@ architecture rtl of decode is
 		imm(0) <= '0';
 	end procedure;
 
+	procedure decode_imm_S_type (
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
+	begin
+		imm(31 downto 11) <= (others => instr(31));
+		imm(10 downto 5) <= instr(30 downto 25);
+		imm(4 downto 0) <= instr(11 downto 7);
+	end procedure;
+
 
 	-- ******* meaning of alusrc{1..3} +**************
 	-- alusrc1 switches input A of ALU between rs1 (alusrc1 = 0) and PC (alusrc1 = 1)
@@ -214,12 +223,12 @@ begin
 					when "000" =>
 						--BEQ
 						exec_op.aluop <= ALU_SUB;
-						mem_op.branch <= BR_CND;
+						mem_op.branch <= BR_CNDI;
 
 					when "001" =>
 						--BNE
 						exec_op.aluop <= ALU_SUB;
-						mem_op.branch <= BR_CNDI;
+						mem_op.branch <= BR_CND;
 
 					when "100" =>
 						--BLT
@@ -244,14 +253,69 @@ begin
 				end case;
 
 			when OPC_LOAD =>
-			--set alu to add rs1 with imm
-			exec_op.alusrc1 <= '0';
-			exec_op.alusrc2 <= '1';
-			exec_op.alusrc2 <= '0'; -- don't care
-			decode_imm_I_type(instr_reg, exec_op.imm);
+				--set alu to use rs1 with imm
+				exec_op.alusrc1 <= '0';
+				exec_op.alusrc2 <= '1';
+				exec_op.alusrc2 <= '0'; -- don't care
+				exec_op.aluop <= ALU_ADD;
+				decode_imm_I_type(instr_reg, exec_op.imm);
 
-			wb_op.write <= '1';
-			wb_op.src <= WBS_ALU;
+				wb_op.write <= '1';
+				wb_op.src <= WBS_MEM;
+
+				mem_op.mem.memread <= '1';
+				mem_op.mem.memwrite <= '0';
+				mem_op.branch <= BR_NOP;
+
+				case instr_reg(14 downto 12) is
+					when "000" =>
+						--LB
+						mem_op.mem.memtype <= MEM_B;
+					when "001" =>
+					 --LH
+						mem_op.mem.memtype <= MEM_H;
+					when "010" =>
+						--LW
+						mem_op.mem.memtype <= MEM_W;
+					when "100" =>
+						--LBU
+						mem_op.mem.memtype <= MEM_BU;
+					when "101" =>
+						--LHU
+						mem_op.mem.memtype <= MEM_HU;
+					when others  => null;
+				end case;
+
+			when OPC_STORE =>
+				-- set alu to use rs1 and imm
+				exec_op.alusrc1 <= '0';
+				exec_op.alusrc2 <= '1';
+				exec_op.alusrc2 <= '0'; -- don't care
+				exec_op.aluop <= ALU_ADD;
+				decode_imm_S_type(instr_reg, exec_op.imm);
+
+				wb_op <= WB_NOP;
+
+				mem_op.mem.memwrite <= '1';
+				mem_op.mem.memread <= '0';
+				mem_op.branch <= BR_NOP;
+
+				case instr_reg(14 downto 12) is
+					when "000" =>
+						--SB
+						mem_op.mem.memtype <= MEM_B;
+					when "001" =>
+						--SH
+						mem_op.mem.memtype <= MEM_H;
+					when "010" =>
+						--SW
+						mem_op.mem.memtype <= MEM_W;
+					when others => null;
+				end case;
+
+			when OPC_OP_IMM =>
+
+
 
 			when others => null;
 
