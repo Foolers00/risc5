@@ -209,6 +209,10 @@ begin
 				wb_op.write <= '1';
 				wb_op.src <= WBS_OPC;
 
+				if instr_reg(14 downto 12) /= "000" then
+					exc_dec <= '1';
+				end if;
+
 			when OPC_BRANCH =>
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '0';
@@ -223,6 +227,7 @@ begin
 					when "000" =>
 						--BEQ
 						exec_op.aluop <= ALU_SUB;
+						-- TODO: ask tutor
 						mem_op.branch <= BR_CNDI;
 
 					when "001" =>
@@ -249,14 +254,17 @@ begin
 						--BGEU
 						exec_op.aluop <= ALU_SLTU;
 						mem_op.branch <= BR_CNDI;
-					when others => null;
+
+					when others =>
+						exc_dec <= '1';
+
 				end case;
 
 			when OPC_LOAD =>
 				--set alu to use rs1 with imm
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '1';
-				exec_op.alusrc2 <= '0'; -- don't care
+				exec_op.alusrc3 <= '0'; -- don't care
 				exec_op.aluop <= ALU_ADD;
 				decode_imm_I_type(instr_reg, exec_op.imm);
 
@@ -283,14 +291,15 @@ begin
 					when "101" =>
 						--LHU
 						mem_op.mem.memtype <= MEM_HU;
-					when others  => null;
+					when others  =>
+						exc_dec <= '1';
 				end case;
 
 			when OPC_STORE =>
 				-- set alu to use rs1 and imm
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '1';
-				exec_op.alusrc2 <= '0'; -- don't care
+				exec_op.alusrc3 <= '0'; -- don't care
 				exec_op.aluop <= ALU_ADD;
 				decode_imm_S_type(instr_reg, exec_op.imm);
 
@@ -310,14 +319,160 @@ begin
 					when "010" =>
 						--SW
 						mem_op.mem.memtype <= MEM_W;
-					when others => null;
+					when others =>
+						exc_dec <= '1';
 				end case;
 
 			when OPC_OP_IMM =>
+				-- set alu to use rs1 and imm
+				exec_op.alusrc1 <= '0';
+				exec_op.alusrc2 <= '1';
+				exec_op.alusrc3 <= '0'; -- don't care
+				decode_imm_I_type(instr_reg, exec_op.imm);
 
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
 
+				mem_op <= MEM_NOP;
 
-			when others => null;
+				case instr_reg(14 downto 12) is
+					when "000" =>
+						--ADDI
+						exec_op.aluop <= ALU_ADD;
+					when "010" =>
+						--SLTI
+						exec_op.aluop <= ALU_SLT;
+					when "011" =>
+						--SLTU
+						exec_op.aluop <= ALU_SLTU;
+					when "100" =>
+						--XORI
+						exec_op.aluop <= ALU_XOR
+					when "110" =>
+						--ORI
+						exec_op.aluop <= ALU_OR;
+					when "111" =>
+						--ANDI
+						exec_op.aluop <= ALU_AND;
+					when "001" =>
+						--SLLI
+						exec_op.aluop <= ALU_SLL;
+					when "101" =>
+						-- imm[10] corresponds to instr[30]
+						-- this bit decides whether the shift is logical or artithmetic
+						if instr_reg(30) = '0' then
+							--SRLI
+							exec_op.aluop <= ALU_SRL;
+						else
+							--SRAI
+							exec_op.aluop <= ALU_SRA;
+						end if;
+
+					when others =>
+						exc_dec <= '1';
+
+				end case;
+
+			when OPC_OP =>
+				-- set alu to use rs1 and rs2
+				exec_op.alusrc1 <= '0';
+				exec_op.alusrc2 <= '0';
+				exec_op.alusrc3 <= '0'; -- don't care
+
+				wb_op.write <= '1';
+				wb_op.src <= WBS_ALU;
+
+				mem_op <= MEM_NOP;
+
+				case instr_reg(14 downto 12) is
+
+					when "000" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--ADD
+							exec_op.aluop <= ALU_ADD;
+						elsif instr_reg(31 downto 25) = "0100000" then
+							--SUB
+							exec_op.aluop <= ALU_SUB;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "001" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--SLL
+							exec_op.aluop <= ALU_SLL;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "010" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--SLT
+							exec_op.aluop <= ALU_SLT;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "011" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--SLTU
+							exec_op.aluop <= ALU_SLTU;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "100" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--XOR
+							exec_op.aluop <= ALU_XOR;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "101" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--SRL
+							exec_op.aluop <= ALU_SRL;
+						elsif instr_reg(31 downto 25) = "0100000" then
+							--SRA
+							exec_op.aluop <= ALU_SRA;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "110" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--OR
+							exec_op.aluop <= ALU_OR;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when "111" =>
+						if instr_reg(31 downto 25) = "0000000" then
+							--AND
+							exec_op.aluop <= ALU_AND;
+						else
+							exc_dec <= '1';
+						end if;
+
+					when others =>
+						exc_dec <= '1';
+
+				end case;
+
+			when "0001111" =>
+				-- FENCE
+				exec_op <= EXEC_NOP;
+				mem_op <= MEM_NOP;
+				wb_OP <= WB_NOP;
+
+				if instr_reg(14 downto 12) /= "000" then
+					exc_dec <= '1';
+				end if;
+
+			when others =>
+				exc_dec <= '1';
 
 		end case;
 
