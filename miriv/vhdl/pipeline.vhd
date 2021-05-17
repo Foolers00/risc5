@@ -53,7 +53,6 @@ architecture impl of pipeline is
 		data => ZERO_DATA
 	);
 
-begin
 
 	component fetch is
 		port (
@@ -190,6 +189,9 @@ begin
 			reg_write  : out reg_write_type
 		);
 	end component;
+
+begin
+
 
 	fetch_inst : fetch
 	port map(

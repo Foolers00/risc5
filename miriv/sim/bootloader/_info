@@ -119,6 +119,10 @@ DPx10 bootloader 7 mem_pkg 0 22 Shhno1ahZ@U86B;^D`ai30
 R1
 R2
 R3
+OV;C;10.5b;63
+33
+R12
+!i10b 0
 d.
 R4
 R5
@@ -127,8 +131,6 @@ L8
 VhdkPcHi5FW^04R`PjM4iF0
 !s100 PbAO>mge<7Lfa6_hf[WWS2
 R6
-33
-R12
 !i113 0
 R8
 R9
