@@ -4,6 +4,7 @@ use ieee.numeric_std.all;
 
 use work.core_pkg.all;
 use work.op_pkg.all;
+use work.mem_pkg.all;
 
 entity decode is
 	port (
@@ -31,10 +32,23 @@ entity decode is
 end entity;
 
 architecture rtl of decode is
+
+	component regfile is
+		port (
+			clk              : in  std_logic;
+			res_n            : in  std_logic;
+			stall            : in  std_logic;
+			rdaddr1, rdaddr2 : in  reg_adr_type;
+			rddata1, rddata2 : out data_type;
+			wraddr           : in  reg_adr_type;
+			wrdata           : in  data_type;
+			regwrite         : in  std_logic
+		);
+	end component;
 	--internal register for incoming signals
 	signal instr_reg : instr_type;
 	signal pc_in_reg : pc_type;
-	signal reg_write_reg : reg_write_tpye;
+	signal reg_write_reg : reg_write_type;
 
 	--interface to regfile
 	signal regfile_rdaddr1, regfile_rdaddr2 : reg_adr_type;
@@ -56,7 +70,7 @@ architecture rtl of decode is
 	constant OPC_LOAD : std_logic_vector(OPC_BITS - 1 downto 0) := "0000011";
 
 	procedure decode_imm_I_type (
-	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 11) <= (others => instr(31));
@@ -64,7 +78,7 @@ architecture rtl of decode is
 	end procedure;
 
 	procedure decode_imm_B_type (
-	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 12) <= (others => instr(31));
@@ -75,14 +89,14 @@ architecture rtl of decode is
 	end procedure;
 
 	procedure decode_imm_U_type (
-	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 12) <= instr(31 downto 12);
 	end procedure;
 
 	procedure decode_imm_J_type (
-	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 20) <= (others => instr(31));
@@ -93,7 +107,7 @@ architecture rtl of decode is
 	end procedure;
 
 	procedure decode_imm_S_type (
-	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0),
+	signal instr : in std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 11) <= (others => instr(31));
@@ -134,18 +148,19 @@ begin
 	decode_instr : process(all)
 	begin
 
+		-- output of regfile is always propageted to exec stage
+		exec_op.readdata1 <= regfile_rddata1;
+		exec_op.readdata2 <= regfile_rddata2;
+
+		-- destination register is propagated to wb stage per default
+		wb_op.rd <= instr_reg(11 downto 7);
+
+		--set default values
+		exec_op.imm <= (others => '0');
+		exec_op.rs1 <= instr_reg(19 downto 15);
+		exec_op.rs2 <= instr_reg(24 downto 20);
+
 		case(instr_reg(OPC_BITS-1 downto 0)) is
-			-- output of regfile is always propageted to exec stage
-			exec_op.readdata1 <= regfile_rddata1;
-			exec_op.readdata2 <= regfile_rddata2;
-
-			-- destination register is propagated to wb stage per default
-			wb_op.rd <= instr_reg(11 downto 7);
-
-			--set default values
-			exec_op.imm <= (others => '0');
-			exec_op.rs1 <= instr_reg(19 downto 15);
-			exec_op.rs2 <= instr_reg(24 downto 20);
 
 
 			when OPC_LUI =>
@@ -347,7 +362,7 @@ begin
 						exec_op.aluop <= ALU_SLTU;
 					when "100" =>
 						--XORI
-						exec_op.aluop <= ALU_XOR
+						exec_op.aluop <= ALU_XOR;
 					when "110" =>
 						--ORI
 						exec_op.aluop <= ALU_OR;
@@ -480,7 +495,7 @@ begin
 
 	sync : process(clk, res_n)
 	begin
-		if res_n = 0 then
+		if res_n = '0' then
 			--reset registers
 		elsif rising_edge(clk) then
 			instr_reg <= instr;
