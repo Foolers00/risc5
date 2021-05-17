@@ -58,12 +58,7 @@ begin
 				R <= std_logic_vector(shift_right(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
 
 			when ALU_SRA =>
-				temp_var := A;
-				for i in 0 to to_integer(unsigned(B(4 downto 0)))-1 loop
-					temp_var := std_logic_vector(shift_right(unsigned(temp_var), 1));
-					temp_var(temp_var'length-1) := A(A'length-1);
-				end loop;
-				R <= temp_var;
+				R <= std_logic_vector(shift_right(signed(A), to_integer(unsigned(B(4 downto 0)))));
 				
 			when ALU_ADD =>
 				R <= std_logic_vector(signed(A) + signed(B));
