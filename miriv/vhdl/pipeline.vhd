@@ -21,6 +21,38 @@ entity pipeline is
 end entity;
 
 architecture impl of pipeline is
+
+	signal stall, flush : std_logic;
+
+	signal if_ctrl_mem_busy : std_logic;
+	signal mem_if_pcsrc : std_logic;
+	signal mem_if_pc : pc_type;
+	signal if_id_pc : pc_type;
+	signal if_id_instr : instr_type;
+	signal wb_id_reg_write : reg_write_type;
+	signal id_ex_pc : pc_type;
+	signal id_ex_exec_op : exec_op_type;
+	signal id_ex_mem_op : mem_op_type;
+	signal id_ex_wb_op : wb_op_type;
+	-- signal id_ctrl_exc_dec : std_logic;
+	signal ex_mem_pc_old, ex_mem_pc_new : pc_type;
+	signal ex_mem_aluresult : data_type;
+	signal ex_mem_wrdata : data_type;
+	signal ex_mem_zero : std_logic;
+	signal ex_mem_mem_op : mem_op_type;
+	signal ex_mem_wb_op : wb_op_type;
+	signal mem_ctrl_mem_busy : std_logic;
+	signal mem_wb_wb_op : wb_op_type;
+	signal mem_wb_pc : pc_type;
+	signal mem_wb_aluresult : data_type;
+	signal meme_wb_memresult : data_type;
+
+	constant REG_WRITE_NOP : reg_write_type := (
+		write => '0',
+		reg => ZERO_REG,
+		data => ZERO_DATA
+	);
+
 begin
 
 	component fetch is
@@ -159,5 +191,120 @@ begin
 		);
 	end component;
 
+	fetch_inst : fetch
+	port map(
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		flush => flush,
+
+		mem_busy => if_ctrl_mem_busy,
+
+		pcsrc => mem_if_pcsrc,
+		pc_in => mem_if_pc,
+		pc_out => if_id_pc,
+		instr => if_id_instr,
+
+		mem_out => mem_i_out,
+		mem_in => mem_i_in
+	);
+
+	decode_inst : decode
+	port map(
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		flush => flush,
+
+		pc_in => if_id_pc,
+		instr => if_id_instr,
+
+		reg_write => wb_id_reg_write,
+
+		pc_out => id_ex_pc,
+		exec_op => id_ex_exec_op,
+		mem_op => id_ex_mem_op,
+		wb_op => id_ex_wb_op,
+		exc_dec => open
+	);
+
+	exec_inst : exec
+	port map(
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		flush => flush,
+
+		op => id_ex_exec_op,
+		pc_in => id_ex_pc,
+
+		pc_old_out => ex_mem_pc_old,
+		pc_new_out => ex_mem_pc_new,
+		aluresult => ex_mem_aluresult,
+		wrdata => ex_mem_wrdata,
+		zero => ex_mem_zero,
+
+		memop_in => id_ex_mem_op,
+		memop_out => ex_mem_mem_op,
+		wbop_in => id_ex_wb_op,
+		wbop_out => ex_mem_wb_op,
+
+		exec_op => open,
+		reg_write_mem => REG_WRITE_NOP,
+		reg_write_wr => REG_WRITE_NOP
+	);
+
+	mem_inst : mem
+	port map(
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		flush => flush,
+
+		mem_busy => mem_ctrl_mem_busy,
+
+		mem_op => ex_mem_mem_op,
+		wbop_in => ex_mem_wb_op,
+		pc_new_in => ex_mem_pc_new,
+		pc_old_in => ex_mem_pc_old,
+		aluresult_in => ex_mem_aluresult,
+		wrdata => ex_mem_wrdata,
+		zero => ex_mem_zero,
+
+		reg_write => open,
+
+		pc_new_out => mem_if_pc,
+		pcsrc => mem_if_pcsrc,
+
+		wbop_out => mem_wb_wb_op,
+		pc_old_out => mem_wb_pc,
+		aluresult_out => mem_wb_aluresult,
+		memresult => meme_wb_memresult,
+
+		mem_out => mem_d_out,
+		mem_in => mem_d_in,
+
+		exc_load => open,
+		exc_store => open
+	);
+
+	wb_inst : wb
+	port map(
+		clk => clk,
+		res_n => res_n,
+		stall => stall,
+		flush => flush,
+
+		op => mem_wb_wb_op,
+		aluresult => mem_wb_aluresult,
+		memresult => meme_wb_memresult,
+		pc_old_in => mem_wb_pc,
+
+		reg_write => wb_id_reg_write
+	);
+
+	flush <= '0';
+
+	stall <= mem_ctrl_mem_busy or if_ctrl_mem_busy;
 
 end architecture;
