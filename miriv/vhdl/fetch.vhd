@@ -30,14 +30,14 @@ end entity;
 architecture rtl of fetch is
 	
 
-	constant PC_REG_RESVAL : pc_type := (1 => '0', 0 => '0', others => '1');
+	constant PC_REG_RESVAL : pc_type := (0 => '0', 1 => '0', others => '1');
 
 	constant PC_ADD : pc_type := (2 => '1', others => '0');
 
-	signal pc_counter_reg, pc_counter_reg_next : pc_type := (others => '0');
+	signal pc_counter_reg, pc_counter_reg_next : pc_type := PC_REG_RESVAL;
 	signal pcsrc_reg, pcsrc_reg_next : std_logic;
 	signal pc_in_reg, pc_in_reg_next : pc_type;
-	signal mem_in_reg, mem_in_reg_next : mem_in_type;
+
 	
 
 begin
@@ -48,12 +48,10 @@ begin
 		if not res_n then
 			pc_in_reg <= ZERO_PC;
 			pcsrc_reg <= '0';
-			mem_in_reg <= MEM_IN_NOP;
 			pc_counter_reg <= PC_REG_RESVAL;
 		elsif rising_edge(clk) then
 			pc_counter_reg <= pc_counter_reg_next;
 			pc_in_reg <= pc_in_reg_next;
-			mem_in_reg <= mem_in_reg_next;
 			pcsrc_reg <= pcsrc_reg_next;
 			
 		end if;
@@ -68,7 +66,6 @@ begin
 		pc_counter_reg_next <= pc_counter_reg;
 		pc_in_reg_next <= pc_in;
 		pcsrc_reg_next <= pcsrc;
-		mem_in_reg_next <= mem_in;
 	
 		current_pc := pc_counter_reg;
 
@@ -87,21 +84,21 @@ begin
 			pc_out <= pc_counter_reg;
 			pc_counter_reg_next <= current_pc;
 
-			if mem_in_reg.busy then
+			if mem_in.busy then
 				mem_busy <= '1';
 			else
 				mem_busy <= '0';
 			end if;
-			instr(7 downto 0) <= mem_in_reg.rddata(31 downto 24);
-			instr(15 downto 8) <= mem_in_reg.rddata(23 downto 16);
-			instr(23 downto 16) <= mem_in_reg.rddata(15 downto 8);
-			instr(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
+			instr(7 downto 0) <= mem_in.rddata(31 downto 24);
+			instr(15 downto 8) <= mem_in.rddata(23 downto 16);
+			instr(23 downto 16) <= mem_in.rddata(15 downto 8);
+			instr(31 downto 24) <= mem_in.rddata(7 downto 0);
+			if not res_n then
+				instr <= NOP_INST;
+			end if;
 		
 			mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
-			mem_out.rd <= '0';
-			if res_n then
-				mem_out.rd <= '1';
-			end if;
+			mem_out.rd <= '1';
 			mem_out.wr <= '0';
 			mem_out.byteena <= (others => '1');
 			mem_out.wrdata <= ZERO_DATA;
@@ -114,7 +111,6 @@ begin
 			pc_counter_reg_next <= pc_counter_reg;
 			pc_in_reg_next <= pc_in_reg;
 			pcsrc_reg_next <= pcsrc_reg;
-			mem_in_reg_next <= mem_in_reg;
 		end if;
 
 	end process;
