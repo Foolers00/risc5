@@ -48,7 +48,6 @@ architecture rtl of decode is
 	--internal register for incoming signals
 	signal instr_reg : instr_type;
 	signal pc_in_reg : pc_type;
-	signal reg_write_reg : reg_write_type;
 
 	--interface to regfile
 	signal regfile_rdaddr1, regfile_rdaddr2 : reg_adr_type;
@@ -143,6 +142,8 @@ begin
 	regfile_wraddr <= reg_write.reg;
 	regfile_wrdata <= reg_write.data;
 	regfile_write <= reg_write.write;
+
+	pc_out <= pc_in_reg;
 
 
 	decode_instr : process(all)
@@ -498,7 +499,14 @@ begin
 		if res_n = '0' then
 			--reset registers
 		elsif rising_edge(clk) then
-			instr_reg <= instr;
+			if stall = '0' then
+				if flush = '0' then
+					instr_reg <= instr;
+				else
+					instr_reg <= NOP_INST;
+				end if;
+				pc_in_reg <= pc_in;
+			end if;
 		end if;
 	end process;
 
