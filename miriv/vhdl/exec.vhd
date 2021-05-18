@@ -132,7 +132,7 @@ begin
 				exec_op_reg_next.readdata2 <= op.imm;
 			end if;
 
-			pc_add_A_reg_next <= std_logic_vector(shift_left(unsigned(op.imm), 1));
+			pc_add_A_reg_next <= op.imm;
 			pc_add_B_reg_next <= to_data_type(pc => pc_in);
 			if op.alusrc3 then
 				pc_add_B_reg_next <= op.readdata1;
