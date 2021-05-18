@@ -35,8 +35,8 @@ architecture rtl of fetch is
 	constant PC_ADD : pc_type := (2 => '1', others => '0');
 
 	signal pc_counter_reg, pc_counter_reg_next : pc_type := PC_REG_RESVAL;
-	signal pcsrc_reg, pcsrc_reg_next : std_logic;
-	signal pc_in_reg, pc_in_reg_next : pc_type;
+	-- signal pcsrc_reg, pcsrc_reg_next : std_logic;
+	-- signal pc_in_reg, pc_in_reg_next : pc_type;
 
 	
 
@@ -46,13 +46,13 @@ begin
 	sync : process (clk, res_n)
 	begin
 		if not res_n then
-			pc_in_reg <= ZERO_PC;
-			pcsrc_reg <= '0';
+			-- pc_in_reg <= ZERO_PC;
+			-- pcsrc_reg <= '0';
 			pc_counter_reg <= PC_REG_RESVAL;
 		elsif rising_edge(clk) then
 			pc_counter_reg <= pc_counter_reg_next;
-			pc_in_reg <= pc_in_reg_next;
-			pcsrc_reg <= pcsrc_reg_next;
+			-- pc_in_reg <= pc_in_reg_next;
+			-- pcsrc_reg <= pcsrc_reg_next;
 			
 		end if;
 	end process;
@@ -64,8 +64,8 @@ begin
 	begin
 		-- New Register Input
 		pc_counter_reg_next <= pc_counter_reg;
-		pc_in_reg_next <= pc_in;
-		pcsrc_reg_next <= pcsrc;
+		-- pc_in_reg_next <= pc_in;
+		-- pcsrc_reg_next <= pcsrc;
 	
 		current_pc := pc_counter_reg;
 
@@ -76,8 +76,8 @@ begin
 			mem_busy <= '0';
 		else	
 		
-			if pcsrc_reg then
-				current_pc := pc_in_reg;
+			if pcsrc then
+				current_pc := pc_in;
 			else
 				current_pc := std_logic_vector(unsigned(pc_counter_reg) + unsigned(PC_ADD));
 			end if;
@@ -109,8 +109,8 @@ begin
 		-- Old Register Input
 		if stall then
 			pc_counter_reg_next <= pc_counter_reg;
-			pc_in_reg_next <= pc_in_reg;
-			pcsrc_reg_next <= pcsrc_reg;
+			-- pc_in_reg_next <= pc_in_reg;
+			-- pcsrc_reg_next <= pcsrc_reg;
 		end if;
 
 	end process;

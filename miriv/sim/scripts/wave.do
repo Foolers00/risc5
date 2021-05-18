@@ -16,10 +16,6 @@ add wave -noupdate -expand -group fetch -radix binary /tb_cpu/dut/pipeline_inst/
 add wave -noupdate -expand -group fetch -radix hexadecimal /tb_cpu/dut/pipeline_inst/fetch_inst/mem_in
 add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_counter_reg
 add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_counter_reg_next
-add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pcsrc_reg
-add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pcsrc_reg_next
-add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_in_reg
-add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_in_reg_next
 add wave -noupdate -divider -height 40 decode
 add wave -noupdate -expand -group decode /tb_cpu/dut/pipeline_inst/decode_inst/clk
 add wave -noupdate -expand -group decode /tb_cpu/dut/pipeline_inst/decode_inst/res_n
@@ -149,4 +145,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits us
 update
-WaveRestoreZoom {0 ps} {98568 ps}
+WaveRestoreZoom {0 ps} {5250 ns}
