@@ -92,6 +92,7 @@ architecture rtl of decode is
 	signal imm : out std_logic_vector(DATA_WIDTH-1 downto 0)) is
 	begin
 		imm(31 downto 12) <= instr(31 downto 12);
+		imm(11 downto 0) <= (others => '0');
 	end procedure;
 
 	procedure decode_imm_J_type (
@@ -149,7 +150,7 @@ begin
 	decode_instr : process(all)
 	begin
 
-		-- output of regfile is always propageted to exec stage
+		-- output of regfile is always forwarded to exec stage
 		exec_op.readdata1 <= regfile_rddata1;
 		exec_op.readdata2 <= regfile_rddata2;
 
