@@ -75,7 +75,7 @@ begin
 		if flush then 
 			instr <= NOP_INST;
 			mem_out <= MEM_OUT_NOP;
-			pc_out <= ZERO_PC;
+			pc_out <= pc_counter_reg;
 			mem_busy <= '0';
 		else	
 		
@@ -98,7 +98,10 @@ begin
 			instr(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
 		
 			mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
-			mem_out.rd <= '1';
+			mem_out.rd <= '0';
+			if res_n then
+				mem_out.rd <= '1';
+			end if;
 			mem_out.wr <= '0';
 			mem_out.byteena <= (others => '1');
 			mem_out.wrdata <= ZERO_DATA;

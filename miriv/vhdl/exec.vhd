@@ -118,8 +118,8 @@ begin
 		if flush then
 			wbop_out <= WB_NOP;
 			memop_out <= MEM_NOP;
-			pc_old_out <= ZERO_PC;
-			pc_new_out <= ZERO_PC;
+			pc_old_out <= pc_old_reg;
+			pc_new_out <= pc_old_reg;
 			wrdata <= ZERO_DATA;
 
 		else
