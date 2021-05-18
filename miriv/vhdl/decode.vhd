@@ -138,8 +138,8 @@ begin
 		regwrite => regfile_write
 	);
 
-	regfile_rdaddr1 <= instr_reg(19 downto 15);
-	regfile_rdaddr2 <= instr_reg(24 downto 20);
+	regfile_rdaddr1 <= instr(19 downto 15);
+	regfile_rdaddr2 <= instr(24 downto 20);
 	regfile_wraddr <= reg_write.reg;
 	regfile_wrdata <= reg_write.data;
 	regfile_write <= reg_write.write;
@@ -161,6 +161,7 @@ begin
 		exec_op.imm <= (others => '0');
 		exec_op.rs1 <= instr_reg(19 downto 15);
 		exec_op.rs2 <= instr_reg(24 downto 20);
+		exc_dec <= '0';
 
 		case(instr_reg(OPC_BITS-1 downto 0)) is
 
