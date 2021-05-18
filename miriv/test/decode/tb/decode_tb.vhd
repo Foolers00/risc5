@@ -66,7 +66,19 @@ architecture sim of decode_tb is
     --sw x1, x2, 64
     constant SW : instr_type := "00000100001000001010000000100011";
 
+    -- lhu x1, x2, 64
+    constant LHU : instr_type := "00000100000000010101000010000011";
 
+    -- beq x2, x3, 1365
+    constant BEQ : instr_type := "00101010001100010000010111100011";
+
+    -- jalr x2, x1, 1365
+    constant JALR : instr_type := "01010101010100001000000101100111";
+
+    --jal x3, 349525
+    constant JAL : instr_type := "00101010101110101010000111101111";
+
+    --auipc x2, 
 
 
 begin
@@ -112,7 +124,7 @@ begin
         wait until rising_edge(clk);
 
         -- testing instructions
-        instr <= SW;
+        instr <= JAL;
         wait until rising_edge(clk);
         instr <= NOP_INST;
 

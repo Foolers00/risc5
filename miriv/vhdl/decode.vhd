@@ -207,7 +207,8 @@ begin
 				exec_op.rs2 <= ZERO_REG;
 				decode_imm_J_type(instr_reg, exec_op.imm);
 
-				mem_op <= MEM_NOP;
+				mem_op.branch <= BR_BR;
+				mem_op.mem <= MEMU_NOP;
 
 				wb_op.write <= '1';
 				wb_op.src <= WBS_OPC;
@@ -222,7 +223,8 @@ begin
 				exec_op.rs2 <= ZERO_REG;
 				decode_imm_I_type(instr_reg,exec_op.imm);
 
-				mem_op <= MEM_NOP;
+				mem_op.branch <= BR_BR;
+				mem_op.mem <= MEMU_NOP;
 
 				wb_op.write <= '1';
 				wb_op.src <= WBS_OPC;
