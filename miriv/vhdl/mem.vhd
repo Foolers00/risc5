@@ -163,22 +163,21 @@ begin
 					if zero_reg then
 						pcsrc <= '1';
 					end if;
-			end case;
+			end case;			
+		end if;
 
-			-- Old Register Input
-			if stall then
-				wbop_reg_next <= wbop_reg;
-				pc_old_reg_next <= pc_old_reg;
-				pc_new_reg_next <= pc_new_reg;
-				aluresult_reg_next <= aluresult_reg;
-				mem_in_reg_next <= mem_in_reg;
-				mem_op_reg_next <= mem_op_reg;
-				mem_op_reg_next.mem.memread <= '0';
-				mem_op_reg_next.mem.memwrite <= '0';
-				wrdata_reg_next <= wrdata_reg;
-				zero_reg_next <= zero_reg;
-			end if;
-			
+		-- Old Register Input
+		if stall then
+			wbop_reg_next <= wbop_reg;
+			pc_old_reg_next <= pc_old_reg;
+			pc_new_reg_next <= pc_new_reg;
+			aluresult_reg_next <= aluresult_reg;
+			mem_in_reg_next <= mem_in_reg;
+			mem_op_reg_next <= mem_op_reg;
+			mem_op_reg_next.mem.memread <= '0';
+			mem_op_reg_next.mem.memwrite <= '0';
+			wrdata_reg_next <= wrdata_reg;
+			zero_reg_next <= zero_reg;
 		end if;
 		
 	end process;

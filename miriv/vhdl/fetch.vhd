@@ -80,11 +80,11 @@ begin
 		else	
 		
 			if pcsrc_reg then
-				current_pc:= pc_in_reg;
+				current_pc := pc_in_reg;
 			else
 				current_pc := std_logic_vector(unsigned(pc_counter_reg) + unsigned(PC_ADD));
 			end if;
-			pc_out <= current_pc;
+			pc_out <= pc_counter_reg;
 			pc_counter_reg_next <= current_pc;
 
 			if mem_in_reg.busy then
@@ -102,15 +102,16 @@ begin
 			mem_out.wr <= '0';
 			mem_out.byteena <= (others => '1');
 			mem_out.wrdata <= ZERO_DATA;
+		end if;
 
-			-- Old Register Input
-			if stall then
-				pc_counter_reg_next <= pc_counter_reg;
-				pc_in_reg_next <= pc_in_reg;
-				pcsrc_reg_next <= pcsrc_reg;
-				mem_in_reg_next <= mem_in_reg;
-			end if;
-			
+
+
+		-- Old Register Input
+		if stall then
+			pc_counter_reg_next <= pc_counter_reg;
+			pc_in_reg_next <= pc_in_reg;
+			pcsrc_reg_next <= pcsrc_reg;
+			mem_in_reg_next <= mem_in_reg;
 		end if;
 
 	end process;

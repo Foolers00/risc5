@@ -137,15 +137,15 @@ begin
 			if op.alusrc3 then
 				pc_add_B_reg_next <= op.readdata1;
 			end if;
-
-			-- Old Register Input
-			if stall then
-				wbop_reg_next <= wbop_reg;
-				mem_op_reg_next <= mem_op_reg;
-				pc_old_reg_next <= pc_old_reg;
-				exec_op_reg_next <= exec_op_reg;
-			end if;
 			
+		end if;
+
+		-- Old Register Input
+		if stall then
+			wbop_reg_next <= wbop_reg;
+			mem_op_reg_next <= mem_op_reg;
+			pc_old_reg_next <= pc_old_reg;
+			exec_op_reg_next <= exec_op_reg;
 		end if;
 
 	end process;

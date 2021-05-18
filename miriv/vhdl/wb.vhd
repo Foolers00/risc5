@@ -80,13 +80,14 @@ begin
 					reg_write.data <= to_data_type(pc => pc_old_in_reg);
 			end case;
 		
-			-- Old Register Input
-			if stall then
-				op_reg_next <= op_reg;
-				aluresult_reg_next <= aluresult_reg;
-				memresult_reg_next <= memresult_reg;
-				pc_old_in_reg_next <= pc_old_in_reg;
-			end if;
+		end if;
+
+		-- Old Register Input
+		if stall then
+			op_reg_next <= op_reg;
+			aluresult_reg_next <= aluresult_reg;
+			memresult_reg_next <= memresult_reg;
+			pc_old_in_reg_next <= pc_old_in_reg;
 		end if;
 
 	end process;
