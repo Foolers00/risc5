@@ -498,7 +498,8 @@ begin
 	sync : process(clk, res_n)
 	begin
 		if res_n = '0' then
-			--reset registers
+			instr_reg <= NOP_INST;
+			pc_in_reg <= ZERO_PC;
 		elsif rising_edge(clk) then
 			if stall = '0' then
 				if flush = '0' then
