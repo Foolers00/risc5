@@ -27,28 +27,10 @@ begin
 
 	-- enables bypassing and ensures that reads from register x0 always return 0
 	-- bypassing: necessary to read registers that are written within the same clk cycle
-	detect_bypassing_and_x0_reads : process(all)
+	output : process(all)
 	begin
 			rddata1 <= rddata1_reg;
 			rddata2 <= rddata2_reg;
-
-			if stall = '0' then
-				if regwrite = '1' then
-					if rdaddr1 = wraddr then
-						rddata1 <= wrdata;
-						if to_integer(unsigned(rdaddr1)) = 0 then
-							rddata1 <= (others => '0');
-						end if;
-					end if;
-
-					if rdaddr2 = wraddr then
-						rddata2 <= wrdata;
-						if to_integer(unsigned(rdaddr2)) = 0 then
-							rddata2 <= (others => '0');
-						end if;
-					end if;
-				end if;
-			end if;
 
 	end process;
 

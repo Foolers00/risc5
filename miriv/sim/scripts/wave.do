@@ -71,67 +71,67 @@ add wave -noupdate -expand -group exec /tb_cpu/dut/pipeline_inst/exec_inst/pc_ad
 add wave -noupdate -expand -group exec /tb_cpu/dut/pipeline_inst/exec_inst/pc_add_B_reg
 add wave -noupdate -expand -group exec /tb_cpu/dut/pipeline_inst/exec_inst/pc_add_B_reg_next
 add wave -noupdate -divider -height 40 mem
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/clk
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/res_n
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/stall
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/flush
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_busy
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_in
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_in
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_in
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_in
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/reg_write
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_out
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pcsrc
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_out
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_out
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_out
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/memresult
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_out
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/exc_load
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/exc_store
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata_reg_next
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero_reg
-add wave -noupdate -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/clk
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/res_n
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/stall
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/flush
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_busy
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_in
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_in
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_in
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_in
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/reg_write
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_out
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pcsrc
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_out
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_out
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_out
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/memresult
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_out
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/exc_load
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/exc_store
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wbop_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/aluresult_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata_reg_next
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero_reg
+add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/zero_reg_next
 add wave -noupdate -divider -height 40 wb
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/clk
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/res_n
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/stall
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/flush
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/reg_write
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op_reg
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op_reg_next
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult_reg
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult_reg_next
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult_reg
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult_reg_next
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg
-add wave -noupdate -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg_next
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/clk
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/res_n
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/stall
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/flush
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/reg_write
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op_reg
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/op_reg_next
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult_reg
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/aluresult_reg_next
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult_reg
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult_reg_next
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg
+add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg_next
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {10000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {144833 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 150
+configure wave -namecolwidth 178
 configure wave -valuecolwidth 227
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -145,4 +145,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits us
 update
-WaveRestoreZoom {0 ps} {5250 ns}
+WaveRestoreZoom {0 ps} {1419562 ps}
