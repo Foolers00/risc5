@@ -108,7 +108,7 @@ begin
 		if exec_op_reg.alusrc1 = '0' then
 			alu_A <= exec_op_reg.readdata1;
 		else
-			alu_A <= pc_in_reg;
+			alu_A <= pc_old_reg;
 		end if;
 
 		if exec_op_reg.alusrc2 = '0' then
