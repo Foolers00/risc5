@@ -36,13 +36,13 @@ begin
 			if regwrite = '1' then
 				if wraddr = rdaddr1_reg then
 					rddata1 <= wrdata;
-					if to_integer(unsigned(rdaddr1)) = 0 then
+					if to_integer(unsigned(rdaddr1_reg)) = 0 then
 						rddata1 <= (others => '0');
 					end if;
 				end if;
 				if wraddr = rdaddr2_reg then
 					rddata2 <= wrdata;
-					if to_integer(unsigned(rdaddr2)) = 0 then
+					if to_integer(unsigned(rdaddr2_reg)) = 0 then
 						rddata2 <= (others => '0');
 					end if;
 				end if;
