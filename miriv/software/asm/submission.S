@@ -15,7 +15,8 @@ loop:
 		jal x0, loop
 		nop
 		nop
+		lw x6, 16(x0)
 		nop
-
+		nop
 		.end _start
 		.size _start, .-_start
