@@ -46,7 +46,7 @@ architecture rtl of exec is
 		);
 	end component;
 
-	
+
 
 	signal wbop_reg, wbop_reg_next : wb_op_type;
 	signal mem_op_reg, mem_op_reg_next : mem_op_type;
@@ -55,7 +55,9 @@ architecture rtl of exec is
 	signal exec_op_reg, exec_op_reg_next : exec_op_type;
 	signal pc_add_A_reg, pc_add_A_reg_next : data_type;
 	signal pc_add_B_reg, pc_add_B_reg_next : data_type;
-	
+
+	signal alu_A, alu_B : data_type;
+
 
 
 begin
@@ -64,8 +66,8 @@ begin
 	alu_inst1 : alu
 	port map (
 		op => exec_op_reg.aluop,
-		A => exec_op_reg.readdata1,
-		B => exec_op_reg.readdata2,
+		A => alu_A,
+		B => alu_B,
 		R => aluresult,
 		Z => zero
 	);
@@ -94,7 +96,7 @@ begin
 			pc_old_reg <= pc_old_reg_next;
 			exec_op_reg <= exec_op_reg_next;
 			pc_add_A_reg <= pc_add_A_reg_next;
-			pc_add_B_reg <= pc_add_B_reg_next;	
+			pc_add_B_reg <= pc_add_B_reg_next;
 		end if;
 	end process;
 
@@ -102,6 +104,19 @@ begin
 
 	alu_reg : process (all)
 	begin
+		--define inputs of ALU
+		if exec_op_reg.alusrc1 = '0' then
+			alu_A <= exec_op_reg.readdata1;
+		else
+			alu_A <= pc_in_reg;
+		end if;
+
+		if exec_op_reg.alusrc2 = '0' then
+			alu_B <= exec_op_reg.readdata2;
+		else
+			alu_B <= exec_op_reg.imm;
+		end if;
+
 		-- New Register Input
 		wbop_reg_next <= wbop_in;
 		mem_op_reg_next <= memop_in;
@@ -114,7 +129,7 @@ begin
 		pc_old_out <= pc_old_reg;
 		pc_new_out <= to_pc_type(data => temp_pc_new_out);
 		wrdata <= exec_op_reg.readdata2;
-		
+
 		if flush then
 			wbop_out <= WB_NOP;
 			memop_out <= MEM_NOP;
@@ -124,20 +139,12 @@ begin
 
 		else
 
-			if op.alusrc1 then
-				exec_op_reg_next.readdata1 <= to_data_type(pc => pc_in);
-			end if;
-
-			if op.alusrc2 then
-				exec_op_reg_next.readdata2 <= op.imm;
-			end if;
-
 			pc_add_A_reg_next <= op.imm;
 			pc_add_B_reg_next <= to_data_type(pc => pc_in);
 			if op.alusrc3 then
 				pc_add_B_reg_next <= op.readdata1;
 			end if;
-			
+
 		end if;
 
 		-- Old Register Input
@@ -149,8 +156,8 @@ begin
 		end if;
 
 	end process;
-	
+
 	exec_op  <= EXEC_NOP;
-	
+
 
 end architecture;
