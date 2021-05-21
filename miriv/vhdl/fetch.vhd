@@ -28,8 +28,8 @@ entity fetch is
 end entity;
 
 architecture rtl of fetch is
-	
 
+hallo
 	constant PC_REG_RESVAL : pc_type := (0 => '0', 1 => '0', others => '1');
 
 	constant PC_ADD : pc_type := (2 => '1', others => '0');
@@ -40,7 +40,7 @@ architecture rtl of fetch is
 
 	signal mem_in_reg, mem_in_reg_next : mem_in_type;
 
-	
+
 
 begin
 
@@ -56,7 +56,7 @@ begin
 			-- pc_in_reg <= pc_in_reg_next;
 			-- pcsrc_reg <= pcsrc_reg_next;
 			mem_in_reg <= mem_in_reg_next;
-			
+
 		end if;
 	end process;
 
@@ -70,16 +70,16 @@ begin
 		-- pc_in_reg_next <= pc_in;
 		-- pcsrc_reg_next <= pcsrc;
 		mem_in_reg_next <= mem_in;
-	
+
 		current_pc := pc_counter_reg;
 
-		if flush then 
+		if flush then
 			instr <= NOP_INST;
 			mem_out <= MEM_OUT_NOP;
 			pc_out <= pc_counter_reg;
 			mem_busy <= '0';
-		else	
-		
+		else
+
 			if pcsrc then
 				current_pc := pc_in;
 			else
@@ -100,7 +100,7 @@ begin
 			if not res_n then
 				instr <= NOP_INST;
 			end if;
-		
+
 			mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
 			mem_out.rd <= '1';
 			mem_out.wr <= '0';
