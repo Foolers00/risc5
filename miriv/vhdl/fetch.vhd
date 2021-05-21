@@ -65,12 +65,14 @@ begin
 
 	async : process(all)
 	begin
-		
+
 		pc_current_next <= pc_current;
-		if pcsrc_reg = '1' then
-			pc_current_next <= pc_in_reg;
-		elsif stall = '0' then
-			pc_current_next <= std_logic_vector(unsigned(pc_current) + unsigned(PC_ADD));
+		if stall = '0' then
+			if pcsrc_reg = '1' then
+				pc_current_next <= pc_in_reg;
+			else
+				pc_current_next <= std_logic_vector(unsigned(pc_current) + unsigned(PC_ADD));
+			end if;
 		end if;
 
 		instr(7 downto 0) <= mem_in.rddata(31 downto 24);
