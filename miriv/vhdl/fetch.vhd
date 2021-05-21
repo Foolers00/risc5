@@ -28,94 +28,56 @@ entity fetch is
 end entity;
 
 architecture rtl of fetch is
-
-hallo
-	constant PC_REG_RESVAL : pc_type := (0 => '0', 1 => '0', others => '1');
-
+	constant PC_REG_RESEST_VAL : pc_type := (0 => '0', 1 => '0', others => '1');
 	constant PC_ADD : pc_type := (2 => '1', others => '0');
 
-	signal pc_counter_reg, pc_counter_reg_next : pc_type := PC_REG_RESVAL;
-	-- signal pcsrc_reg, pcsrc_reg_next : std_logic;
-	-- signal pc_in_reg, pc_in_reg_next : pc_type;
-
-	signal mem_in_reg, mem_in_reg_next : mem_in_type;
-
-
+	signal pcsrc_reg : std_logic;
+	signal pc_in_reg : pc_type;
+	signal pc_current, pc_current_next : pc_type;
 
 begin
 
+	mem_busy <= mem_in.busy;
+
+	mem_out.address <= pc_current_next(ADDR_WIDTH+1 downto 2);
+	mem_out.rd <= '1';
+	mem_out.wr <= '0';
+	mem_out.byteena <= (others => '1');
+	mem_out.wrdata <= ZERO_DATA;
+
+	pc_out <= pc_current_next;
 
 	sync : process (clk, res_n)
 	begin
-		if not res_n then
-			-- pc_in_reg <= ZERO_PC;
-			-- pcsrc_reg <= '0';
-			pc_counter_reg <= PC_REG_RESVAL;
-		elsif rising_edge(clk) then
-			pc_counter_reg <= pc_counter_reg_next;
-			-- pc_in_reg <= pc_in_reg_next;
-			-- pcsrc_reg <= pcsrc_reg_next;
-			mem_in_reg <= mem_in_reg_next;
+		if res_n = '0' then
+			pc_current <= PC_REG_RESEST_VAL;
+			pcsrc_reg <= '0';
+			pc_in_reg <= ZERO_PC;
 
+		elsif rising_edge(clk) then
+			if stall = '0' then
+				pcsrc_reg <= pcsrc;
+				pc_in_reg <= pc_in;
+				pc_current <= pc_current_next;
+			end if;
 		end if;
 	end process;
 
-
-
-	pc_reg : process (all)
-	variable current_pc : pc_type;
+	async : process(all)
 	begin
-		-- New Register Input
-		pc_counter_reg_next <= pc_counter_reg;
-		-- pc_in_reg_next <= pc_in;
-		-- pcsrc_reg_next <= pcsrc;
-		mem_in_reg_next <= mem_in;
 
-		current_pc := pc_counter_reg;
-
-		if flush then
-			instr <= NOP_INST;
-			mem_out <= MEM_OUT_NOP;
-			pc_out <= pc_counter_reg;
-			mem_busy <= '0';
+		if pcsrc_reg = '1' then
+			pc_current_next <= pc_in_reg;
 		else
-
-			if pcsrc then
-				current_pc := pc_in;
-			else
-				current_pc := std_logic_vector(unsigned(pc_counter_reg) + unsigned(PC_ADD));
-			end if;
-			pc_out <= pc_counter_reg;
-			pc_counter_reg_next <= current_pc;
-
-			if mem_in.busy then
-				mem_busy <= '1';
-			else
-				mem_busy <= '0';
-			end if;
-			instr(7 downto 0) <= mem_in_reg.rddata(31 downto 24);
-			instr(15 downto 8) <= mem_in_reg.rddata(23 downto 16);
-			instr(23 downto 16) <= mem_in_reg.rddata(15 downto 8);
-			instr(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
-			if not res_n then
-				instr <= NOP_INST;
-			end if;
-
-			mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
-			mem_out.rd <= '1';
-			mem_out.wr <= '0';
-			mem_out.byteena <= (others => '1');
-			mem_out.wrdata <= ZERO_DATA;
+			pc_current_next <= std_logic_vector(unsigned(pc_current) + unsigned(PC_ADD));
 		end if;
 
-
-
-		-- Old Register Input
-		if stall then
-			pc_counter_reg_next <= pc_counter_reg;
-			mem_in_reg_next <= mem_in_reg;
-			-- pc_in_reg_next <= pc_in_reg;
-			-- pcsrc_reg_next <= pcsrc_reg;
+		instr(7 downto 0) <= mem_in.rddata(31 downto 24);
+		instr(15 downto 8) <= mem_in.rddata(23 downto 16);
+		instr(23 downto 16) <= mem_in.rddata(15 downto 8);
+		instr(31 downto 24) <= mem_in.rddata(7 downto 0);
+		if res_n = '0' then
+			instr <= NOP_INST;
 		end if;
 
 	end process;
