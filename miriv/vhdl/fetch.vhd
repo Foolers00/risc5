@@ -37,8 +37,8 @@ architecture rtl of fetch is
 	signal pc_counter_reg, pc_counter_reg_next : pc_type := PC_REG_RESVAL;
 	-- signal pcsrc_reg, pcsrc_reg_next : std_logic;
 	-- signal pc_in_reg, pc_in_reg_next : pc_type;
-
-	signal mem_in_reg, mem_in_reg_next : mem_in_type;
+	signal instr_reg, instr_reg_next : instr_type;
+	
 
 	
 
@@ -51,11 +51,12 @@ begin
 			-- pc_in_reg <= ZERO_PC;
 			-- pcsrc_reg <= '0';
 			pc_counter_reg <= PC_REG_RESVAL;
+			instr_reg <= NOP_INST;
 		elsif rising_edge(clk) then
 			pc_counter_reg <= pc_counter_reg_next;
+			instr_reg <= instr_reg_next;
 			-- pc_in_reg <= pc_in_reg_next;
 			-- pcsrc_reg <= pcsrc_reg_next;
-			mem_in_reg <= mem_in_reg_next;
 			
 		end if;
 	end process;
@@ -69,7 +70,7 @@ begin
 		pc_counter_reg_next <= pc_counter_reg;
 		-- pc_in_reg_next <= pc_in;
 		-- pcsrc_reg_next <= pcsrc;
-		mem_in_reg_next <= mem_in;
+		instr <= instr_reg_next;
 	
 		current_pc := pc_counter_reg;
 
@@ -93,10 +94,10 @@ begin
 			else
 				mem_busy <= '0';
 			end if;
-			instr(7 downto 0) <= mem_in_reg.rddata(31 downto 24);
-			instr(15 downto 8) <= mem_in_reg.rddata(23 downto 16);
-			instr(23 downto 16) <= mem_in_reg.rddata(15 downto 8);
-			instr(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
+			instr_reg_next(7 downto 0) <= mem_in.rddata(31 downto 24);
+			instr_reg_next(15 downto 8) <= mem_in.rddata(23 downto 16);
+			instr_reg_next(23 downto 16) <= mem_in.rddata(15 downto 8);
+			instr_reg_next(31 downto 24) <= mem_in.rddata(7 downto 0);
 			if not res_n then
 				instr <= NOP_INST;
 			end if;
@@ -113,7 +114,10 @@ begin
 		-- Old Register Input
 		if stall then
 			pc_counter_reg_next <= pc_counter_reg;
-			mem_in_reg_next <= mem_in_reg;
+			instr_reg_next <= instr_reg;
+			current_pc := std_logic_vector(unsigned(current_pc) - unsigned(PC_ADD));
+			mem_out.address <= current_pc(ADDR_WIDTH+1 downto 2);
+			instr <= instr_reg;
 			-- pc_in_reg_next <= pc_in_reg;
 			-- pcsrc_reg_next <= pcsrc_reg;
 		end if;
