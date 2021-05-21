@@ -38,6 +38,8 @@ architecture rtl of fetch is
 	-- signal pcsrc_reg, pcsrc_reg_next : std_logic;
 	-- signal pc_in_reg, pc_in_reg_next : pc_type;
 
+	signal mem_in_reg, mem_in_reg_next : mem_in_type;
+
 	
 
 begin
@@ -53,6 +55,7 @@ begin
 			pc_counter_reg <= pc_counter_reg_next;
 			-- pc_in_reg <= pc_in_reg_next;
 			-- pcsrc_reg <= pcsrc_reg_next;
+			mem_in_reg <= mem_in_reg_next;
 			
 		end if;
 	end process;
@@ -66,6 +69,7 @@ begin
 		pc_counter_reg_next <= pc_counter_reg;
 		-- pc_in_reg_next <= pc_in;
 		-- pcsrc_reg_next <= pcsrc;
+		mem_in_reg_next <= mem_in;
 	
 		current_pc := pc_counter_reg;
 
@@ -89,10 +93,10 @@ begin
 			else
 				mem_busy <= '0';
 			end if;
-			instr(7 downto 0) <= mem_in.rddata(31 downto 24);
-			instr(15 downto 8) <= mem_in.rddata(23 downto 16);
-			instr(23 downto 16) <= mem_in.rddata(15 downto 8);
-			instr(31 downto 24) <= mem_in.rddata(7 downto 0);
+			instr(7 downto 0) <= mem_in_reg.rddata(31 downto 24);
+			instr(15 downto 8) <= mem_in_reg.rddata(23 downto 16);
+			instr(23 downto 16) <= mem_in_reg.rddata(15 downto 8);
+			instr(31 downto 24) <= mem_in_reg.rddata(7 downto 0);
 			if not res_n then
 				instr <= NOP_INST;
 			end if;
@@ -109,6 +113,7 @@ begin
 		-- Old Register Input
 		if stall then
 			pc_counter_reg_next <= pc_counter_reg;
+			mem_in_reg_next <= mem_in_reg;
 			-- pc_in_reg_next <= pc_in_reg;
 			-- pcsrc_reg_next <= pcsrc_reg;
 		end if;
