@@ -65,10 +65,11 @@ begin
 
 	async : process(all)
 	begin
-
+		
+		pc_current_next <= pc_current;
 		if pcsrc_reg = '1' then
 			pc_current_next <= pc_in_reg;
-		else
+		elsif stall = '0' then
 			pc_current_next <= std_logic_vector(unsigned(pc_current) + unsigned(PC_ADD));
 		end if;
 
