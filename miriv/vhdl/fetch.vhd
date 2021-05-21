@@ -45,7 +45,7 @@ begin
 	mem_out.byteena <= (others => '1');
 	mem_out.wrdata <= ZERO_DATA;
 
-	pc_out <= pc_current_next;
+	pc_out <= pc_current;
 
 	sync : process (clk, res_n)
 	begin
