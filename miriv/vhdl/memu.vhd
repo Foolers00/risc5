@@ -45,33 +45,56 @@ begin
 			B <= '0';
 		end if;
 
+		-- Reading result from memory interface
+		case op.memtype is
+			when MEM_B | MEM_BU=>
+				if op.memtype = MEM_BU then
+					sign_extend := '0';
+				end if;
+				R(31 downto 8) <= (others => sign_extend); 
+				case byte_address is
+					when "00" =>
+						R(7 downto 0) <=  D.rddata(31 downto 24);
+					when "01" =>
+						R(7 downto 0) <=  D.rddata(23 downto 16);	
+					when "10" =>
+						R(7 downto 0) <=  D.rddata(15 downto 8);
+					when "11" =>
+						R(7 downto 0) <=  D.rddata(7 downto 0);
+					when others =>
+				end case;
+			
+			when MEM_H | MEM_HU =>
+				if op.memtype = MEM_HU then
+					sign_extend := '0';
+				end if;
+				R(31 downto 16) <= (others => sign_extend); 
+				case byte_address is
+					when "00" | "01" =>
+						R(7 downto 0) <=  D.rddata(31 downto 24);
+						R(15 downto 8) <=  D.rddata(23 downto 16);
+					when "10" | "11" =>
+						R(7 downto 0) <=  D.rddata(15 downto 8);
+						R(15 downto 8) <=  D.rddata(7 downto 0);
+					when others =>
+				end case;
 
+			when MEM_W =>
+				R(7 downto 0) <= D.rddata(31 downto 24);
+				R(15 downto 8) <= D.rddata(23 downto 16);
+				R(23 downto 16) <= D.rddata(15 downto 8);
+				R(31 downto 24) <= D.rddata(7 downto 0);
+		end case;  
+
+		-- setting up the output signal for memory interface (read)
 		if op.memread then
 			M.rd <= '1';
+			M.address <= A(M.address'length+1 downto 2);
 			B <= '1';
+
 			case op.memtype is
-				when MEM_B | MEM_BU=>
-					if op.memtype = MEM_BU then
-						sign_extend := '0';
-					end if;
-					R(31 downto 8) <= (others => sign_extend); 
-					case byte_address is
-						when "00" =>
-							R(7 downto 0) <=  D.rddata(31 downto 24);
-						when "01" =>
-							R(7 downto 0) <=  D.rddata(23 downto 16);	
-						when "10" =>
-							R(7 downto 0) <=  D.rddata(15 downto 8);
-						when "11" =>
-							R(7 downto 0) <=  D.rddata(7 downto 0);
-						when others =>
-					end case;
-				
+
 				when MEM_H | MEM_HU =>
-					if op.memtype = MEM_HU then
-						sign_extend := '0';
-					end if;
-					R(31 downto 16) <= (others => sign_extend); 
 					case byte_address is
 						when "00" | "01" =>
 							if byte_address = "01" then
@@ -79,34 +102,31 @@ begin
 								M.rd <= '0';
 								B <= '0';
 							end if;
-							R(7 downto 0) <=  D.rddata(31 downto 24);
-							R(15 downto 8) <=  D.rddata(23 downto 16);
 						when "10" | "11" =>
 							if byte_address = "11" then
 								XL <= '1';
 								M.rd <= '0';
 								B <= '0';
 							end if;
-							R(7 downto 0) <=  D.rddata(15 downto 8);
-							R(15 downto 8) <=  D.rddata(7 downto 0);
 						when others =>
 					end case;
-
+	
 				when MEM_W =>
 					if byte_address /= "00" then
 						XL <= '1';
 						M.rd <= '0';
 						B <= '0';
 					end if;
-					R(7 downto 0) <= D.rddata(31 downto 24);
-					R(15 downto 8) <= D.rddata(23 downto 16);
-					R(23 downto 16) <= D.rddata(15 downto 8);
-					R(31 downto 24) <= D.rddata(7 downto 0);
+				
+				when others =>
 			end case;  
 
+		-- setting up the output signal for memory interface (write)
 		elsif op.memwrite then
 			M.wr <= '1';
 			M.address <= A(M.address'length+1 downto 2);
+
+			-- writing data to memory interface
 			case op.memtype is
 				when MEM_B | MEM_BU =>
 					case byte_address is

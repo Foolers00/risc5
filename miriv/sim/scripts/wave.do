@@ -129,7 +129,7 @@ add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult
 add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg
 add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg_next
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {144833 ps} 0}
+WaveRestoreCursors {{Cursor 1} {135000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 178
 configure wave -valuecolwidth 227
@@ -145,4 +145,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits us
 update
-WaveRestoreZoom {0 ps} {1419562 ps}
+WaveRestoreZoom {82945 ps} {213853 ps}
