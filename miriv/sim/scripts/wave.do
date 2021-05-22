@@ -16,6 +16,8 @@ add wave -noupdate -expand -group fetch -radix binary /tb_cpu/dut/pipeline_inst/
 add wave -noupdate -expand -group fetch -radix hexadecimal /tb_cpu/dut/pipeline_inst/fetch_inst/mem_in
 add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_counter_reg
 add wave -noupdate -expand -group fetch /tb_cpu/dut/pipeline_inst/fetch_inst/pc_counter_reg_next
+add wave -noupdate /tb_cpu/dut/pipeline_inst/fetch_inst/instr_reg
+add wave -noupdate /tb_cpu/dut/pipeline_inst/fetch_inst/instr_reg_next
 add wave -noupdate -divider -height 40 decode
 add wave -noupdate -expand -group decode /tb_cpu/dut/pipeline_inst/decode_inst/clk
 add wave -noupdate -expand -group decode /tb_cpu/dut/pipeline_inst/decode_inst/res_n
@@ -102,8 +104,6 @@ add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_old_reg_next
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/pc_new_reg_next
-add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg
-add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_in_reg_next
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/mem_op_reg_next
 add wave -noupdate -expand -group mem /tb_cpu/dut/pipeline_inst/mem_inst/wrdata_reg
@@ -129,7 +129,7 @@ add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/memresult
 add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg
 add wave -noupdate -expand -group wb /tb_cpu/dut/pipeline_inst/wb_inst/pc_old_in_reg_next
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {135000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {35671 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 178
 configure wave -valuecolwidth 227
@@ -145,4 +145,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits us
 update
-WaveRestoreZoom {82945 ps} {213853 ps}
+WaveRestoreZoom {0 ps} {204366 ps}

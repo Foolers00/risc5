@@ -19,5 +19,6 @@ loop:
 		jal x0, loop
 		nop
 		nop
+		nop
 		.end _start
 		.size _start, .-_start
