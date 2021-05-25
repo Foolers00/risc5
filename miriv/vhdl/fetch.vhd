@@ -31,8 +31,6 @@ architecture rtl of fetch is
 	constant PC_REG_RESEST_VAL : pc_type := (0 => '0', 1 => '0', others => '1');
 	constant PC_ADD : pc_type := (2 => '1', others => '0');
 
-	signal pcsrc_reg : std_logic;
-	signal pc_in_reg : pc_type;
 	signal pc_current, pc_current_next : pc_type;
 
 begin
@@ -51,13 +49,9 @@ begin
 	begin
 		if res_n = '0' then
 			pc_current <= PC_REG_RESEST_VAL;
-			pcsrc_reg <= '0';
-			pc_in_reg <= ZERO_PC;
 
 		elsif rising_edge(clk) then
 			if stall = '0' then
-				pcsrc_reg <= pcsrc;
-				pc_in_reg <= pc_in;
 				pc_current <= pc_current_next;
 			end if;
 		end if;
@@ -68,8 +62,8 @@ begin
 
 		pc_current_next <= pc_current;
 		if stall = '0' then
-			if pcsrc_reg = '1' then
-				pc_current_next <= pc_in_reg;
+			if pcsrc = '1' then
+				pc_current_next <= pc_in;
 			else
 				pc_current_next <= std_logic_vector(unsigned(pc_current) + unsigned(PC_ADD));
 			end if;
