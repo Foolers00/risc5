@@ -505,12 +505,11 @@ begin
 			pc_in_reg <= ZERO_PC;
 		elsif rising_edge(clk) then
 			if stall = '0' then
-				if flush = '0' then
-					instr_reg <= instr;
-				else
-					instr_reg <= NOP_INST;
-				end if;
+				instr_reg <= instr;
 				pc_in_reg <= pc_in;
+			end if;
+			if flush = '1' then
+				instr_reg <= NOP_INST;
 			end if;
 		end if;
 	end process;
