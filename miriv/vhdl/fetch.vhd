@@ -79,7 +79,7 @@ begin
 		instr(15 downto 8) <= mem_in.rddata(23 downto 16);
 		instr(23 downto 16) <= mem_in.rddata(15 downto 8);
 		instr(31 downto 24) <= mem_in.rddata(7 downto 0);
-		if res_n = '0' then
+		if res_n = '0' or flush = '1' then
 			instr <= NOP_INST;
 		end if;
 
