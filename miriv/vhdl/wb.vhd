@@ -77,7 +77,8 @@ begin
 				when WBS_MEM =>
 					reg_write.data <= memresult_reg;
 				when WBS_OPC =>
-					reg_write.data <= to_data_type(pc => pc_old_in_reg);
+					-- write back programm counter of next instruction (only used for jal and jalr instructions)
+					reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_in_reg) + 4));
 			end case;
 		
 		end if;
