@@ -37,7 +37,7 @@ begin
 		XL <= '0';
 		XS <= '0';
 		byte_address := A(1 downto 0);
-		sign_extend := D.rddata(31);
+		sign_extend := '0';
 
 		if D.busy then --should change?
 			B <= '1';
@@ -48,36 +48,42 @@ begin
 		-- Reading result from memory interface
 		case op.memtype is
 			when MEM_B | MEM_BU=>
+				case byte_address is
+					when "00" =>
+						sign_extend := D.rddata(31);
+						R(7 downto 0) <=  D.rddata(31 downto 24);
+					when "01" =>
+						sign_extend := D.rddata(23);
+						R(7 downto 0) <=  D.rddata(23 downto 16);	
+					when "10" =>
+						sign_extend := D.rddata(15);
+						R(7 downto 0) <=  D.rddata(15 downto 8);
+					when "11" =>
+						sign_extend := D.rddata(7);
+						R(7 downto 0) <=  D.rddata(7 downto 0);
+					when others =>
+				end case;
 				if op.memtype = MEM_BU then
 					sign_extend := '0';
 				end if;
 				R(31 downto 8) <= (others => sign_extend); 
-				case byte_address is
-					when "00" =>
-						R(7 downto 0) <=  D.rddata(31 downto 24);
-					when "01" =>
-						R(7 downto 0) <=  D.rddata(23 downto 16);	
-					when "10" =>
-						R(7 downto 0) <=  D.rddata(15 downto 8);
-					when "11" =>
-						R(7 downto 0) <=  D.rddata(7 downto 0);
-					when others =>
-				end case;
-			
+
 			when MEM_H | MEM_HU =>
-				if op.memtype = MEM_HU then
-					sign_extend := '0';
-				end if;
-				R(31 downto 16) <= (others => sign_extend); 
 				case byte_address is
 					when "00" | "01" =>
+						sign_extend := D.rddata(23);
 						R(7 downto 0) <=  D.rddata(31 downto 24);
 						R(15 downto 8) <=  D.rddata(23 downto 16);
 					when "10" | "11" =>
+						sign_extend := D.rddata(7);
 						R(7 downto 0) <=  D.rddata(15 downto 8);
 						R(15 downto 8) <=  D.rddata(7 downto 0);
 					when others =>
 				end case;
+				if op.memtype = MEM_HU then
+					sign_extend := '0';
+				end if;
+				R(31 downto 16) <= (others => sign_extend); 
 
 			when MEM_W =>
 				R(7 downto 0) <= D.rddata(31 downto 24);
