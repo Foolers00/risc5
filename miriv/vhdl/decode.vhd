@@ -363,7 +363,7 @@ begin
 						--SLTI
 						exec_op.aluop <= ALU_SLT;
 					when "011" =>
-						--SLTU
+						--SLTIU
 						exec_op.aluop <= ALU_SLTU;
 					when "100" =>
 						--XORI
