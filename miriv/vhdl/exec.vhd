@@ -129,6 +129,13 @@ begin
 		pc_old_out <= pc_old_reg;
 		pc_new_out <= to_pc_type(data => temp_pc_new_out);
 		wrdata <= exec_op_reg.readdata2;
+		
+		
+		pc_add_A_reg_next <= op.imm;
+			pc_add_B_reg_next <= to_data_type(pc => pc_in);
+			if op.alusrc3 then
+				pc_add_B_reg_next <= op.readdata1;
+			end if;
 
 		if flush then
 			wbop_out <= WB_NOP;
@@ -136,15 +143,6 @@ begin
 			pc_old_out <= pc_old_reg;
 			pc_new_out <= pc_old_reg;
 			wrdata <= ZERO_DATA;
-
-		else
-
-			pc_add_A_reg_next <= op.imm;
-			pc_add_B_reg_next <= to_data_type(pc => pc_in);
-			if op.alusrc3 then
-				pc_add_B_reg_next <= op.readdata1;
-			end if;
-
 		end if;
 
 		-- Old Register Input

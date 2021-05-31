@@ -139,6 +139,7 @@ begin
 		pc_old_out <= pc_old_reg;
 		pc_new_out <= pc_new_reg;
 		aluresult_out <= aluresult_reg;
+		pcsrc <= '0';
 
 		if flush then
 			wbop_out <= WB_NOP;
