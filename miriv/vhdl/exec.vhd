@@ -53,8 +53,8 @@ architecture rtl of exec is
 	signal pc_old_reg, pc_old_reg_next : pc_type;
 	signal temp_pc_new_out : data_type;
 	signal exec_op_reg, exec_op_reg_next : exec_op_type;
-	signal pc_add_A_reg, pc_add_A_reg_next : data_type;
-	signal pc_add_B_reg, pc_add_B_reg_next : data_type;
+	signal pc_add_A : data_type;
+	signal pc_add_B : data_type;
 
 	signal alu_A, alu_B : data_type;
 
@@ -75,8 +75,8 @@ begin
 	alu_inst2 : alu
 	port map (
 		op => ALU_ADD,
-		A => pc_add_A_reg,
-		B => pc_add_B_reg,
+		A => pc_add_A,
+		B => pc_add_B,
 		R => temp_pc_new_out,
 		Z => open
 	);
@@ -88,15 +88,15 @@ begin
 			mem_op_reg <= MEM_NOP;
 			pc_old_reg <= ZERO_PC;
 			exec_op_reg <= EXEC_NOP;
-			pc_add_A_reg <= ZERO_DATA;
-			pc_add_B_reg <= ZERO_DATA;
+			-- pc_add_A_reg <= ZERO_DATA;
+			-- pc_add_B_reg <= ZERO_DATA;
 		elsif rising_edge(clk) then
 			wbop_reg <= wbop_reg_next;
 			mem_op_reg <= mem_op_reg_next;
 			pc_old_reg <= pc_old_reg_next;
 			exec_op_reg <= exec_op_reg_next;
-			pc_add_A_reg <= pc_add_A_reg_next;
-			pc_add_B_reg <= pc_add_B_reg_next;
+			-- pc_add_A_reg <= pc_add_A_reg_next;
+			-- pc_add_B_reg <= pc_add_B_reg_next;
 		end if;
 	end process;
 
@@ -117,6 +117,12 @@ begin
 			alu_B <= exec_op_reg.imm;
 		end if;
 
+		pc_add_A <= exec_op_reg.imm;
+		pc_add_B <= to_data_type(pc => pc_old_reg);
+		if op.alusrc3 then
+			pc_add_B <= exec_op_reg.readdata1;
+		end if;
+
 		-- New Register Input
 		wbop_reg_next <= wbop_in;
 		mem_op_reg_next <= memop_in;
@@ -130,12 +136,6 @@ begin
 		pc_new_out <= to_pc_type(data => temp_pc_new_out);
 		wrdata <= exec_op_reg.readdata2;
 		
-		
-		pc_add_A_reg_next <= op.imm;
-			pc_add_B_reg_next <= to_data_type(pc => pc_in);
-			if op.alusrc3 then
-				pc_add_B_reg_next <= op.readdata1;
-			end if;
 
 		if flush then
 			wbop_out <= WB_NOP;
