@@ -21,7 +21,7 @@ architecture rtl of regfile is
 
 	type reg_type is array (0 to (2 ** REG_BITS) - 1) of data_type;
 	signal reg : reg_type := (others => (others => '0'));
-	signal rdaddr1_reg, rdaddr2_reg : reg_adr_type;
+	signal rdaddr1_reg, rdaddr2_reg : reg_adr_type := ZERO_REG;
 
 begin
 
