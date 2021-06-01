@@ -55,7 +55,6 @@ begin
 			if (res_n = '0') then
 				rdaddr1_reg <= ZERO_REG;
 				rdaddr2_reg <= ZERO_REG;
-				reg(0) <= (others => '0');
 
 			elsif rising_edge(clk) then
 				if stall = '0' then
