@@ -29,10 +29,9 @@ begin
 	-- bypassing: necessary to read registers that are written within the same clk cycle
 	output : process(all)
 	begin
+		rddata1 <= reg(to_integer(unsigned(rdaddr1_reg)));
+		rddata2 <= reg(to_integer(unsigned(rdaddr2_reg)));
 		if stall = '0' then
-			rddata1 <= reg(to_integer(unsigned(rdaddr1_reg)));
-			rddata2 <= reg(to_integer(unsigned(rdaddr2_reg)));
-
 			if regwrite = '1' then
 				if wraddr = rdaddr1_reg then
 					rddata1 <= wrdata;

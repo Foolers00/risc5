@@ -150,6 +150,15 @@ begin
 	decode_instr : process(all)
 	begin
 
+		--set default values
+		exec_op <= EXEC_NOP;
+		wb_op <= WB_NOP;
+		mem_op <= MEM_NOP;
+
+		exec_op.imm <= (others => '0');
+		exec_op.rs1 <= instr_reg(19 downto 15);
+		exec_op.rs2 <= instr_reg(24 downto 20);
+
 		-- output of regfile is always forwarded to exec stage
 		exec_op.readdata1 <= regfile_rddata1;
 		exec_op.readdata2 <= regfile_rddata2;
@@ -157,10 +166,6 @@ begin
 		-- destination register is propagated to wb stage per default
 		wb_op.rd <= instr_reg(11 downto 7);
 
-		--set default values
-		exec_op.imm <= (others => '0');
-		exec_op.rs1 <= instr_reg(19 downto 15);
-		exec_op.rs2 <= instr_reg(24 downto 20);
 		exc_dec <= '0';
 
 		case(instr_reg(OPC_BITS-1 downto 0)) is
@@ -172,8 +177,6 @@ begin
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '1'; -- take immediate value for B input of ALU
 				exec_op.alusrc3 <= '0';
-				exec_op.rs1 <= ZERO_REG;
-				exec_op.rs2 <= ZERO_REG;
 				decode_imm_U_type(instr_reg,exec_op.imm);
 
 				mem_op <= MEM_NOP;
@@ -188,8 +191,6 @@ begin
 				exec_op.alusrc1 <= '1'; -- choose PC for input A
 				exec_op.alusrc2 <= '1'; -- choose imm for input B
 				exec_op.alusrc3 <= '0';
-				exec_op.rs1 <= ZERO_REG;
-				exec_op.rs2 <= ZERO_REG;
 				decode_imm_U_type(instr_reg, exec_op.imm);
 
 				mem_op <= MEM_NOP;
@@ -203,8 +204,6 @@ begin
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '0';
 				exec_op.alusrc3 <= '0'; -- set PC adder to add imm and pc
-				exec_op.rs1 <= ZERO_REG;
-				exec_op.rs2 <= ZERO_REG;
 				decode_imm_J_type(instr_reg, exec_op.imm);
 
 				mem_op.branch <= BR_BR;
@@ -219,8 +218,6 @@ begin
 				exec_op.alusrc1 <= '0';
 				exec_op.alusrc2 <= '0';
 				exec_op.alusrc3 <= '1'; -- set PC adder to add imm and rs1
-				exec_op.rs1 <= ZERO_REG;
-				exec_op.rs2 <= ZERO_REG;
 				decode_imm_I_type(instr_reg,exec_op.imm);
 
 				mem_op.branch <= BR_BR;
