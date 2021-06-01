@@ -230,7 +230,7 @@ begin
 		exc_dec => open
 	);
 
-	exec_inst : exec
+	execute_inst : exec
 	port map(
 		clk => clk,
 		res_n => res_n,
@@ -256,7 +256,7 @@ begin
 		reg_write_wr => REG_WRITE_NOP
 	);
 
-	mem_inst : mem
+	memory_inst : mem
 	port map(
 		clk => clk,
 		res_n => res_n,
@@ -290,7 +290,7 @@ begin
 		exc_store => open
 	);
 
-	wb_inst : wb
+	writeback_inst : wb
 	port map(
 		clk => clk,
 		res_n => res_n,
