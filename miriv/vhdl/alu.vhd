@@ -66,7 +66,7 @@ begin
 			when ALU_SUB =>
 				temp_var := std_logic_vector(signed(A) - signed(B));
 				R <= temp_var;
-				if to_integer(unsigned(temp_var)) = 0 then
+				if unsigned(temp_var) = 0 then
 					Z <= '1';
 				else
 					Z <= '0';
