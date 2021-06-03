@@ -88,15 +88,11 @@ begin
 			mem_op_reg <= MEM_NOP;
 			pc_old_reg <= ZERO_PC;
 			exec_op_reg <= EXEC_NOP;
-			-- pc_add_A_reg <= ZERO_DATA;
-			-- pc_add_B_reg <= ZERO_DATA;
 		elsif rising_edge(clk) then
 			wbop_reg <= wbop_reg_next;
 			mem_op_reg <= mem_op_reg_next;
 			pc_old_reg <= pc_old_reg_next;
 			exec_op_reg <= exec_op_reg_next;
-			-- pc_add_A_reg <= pc_add_A_reg_next;
-			-- pc_add_B_reg <= pc_add_B_reg_next;
 		end if;
 	end process;
 

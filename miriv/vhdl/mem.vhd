@@ -75,7 +75,6 @@ architecture rtl of mem is
 	signal aluresult_reg, aluresult_reg_next : data_type;
 	signal pc_old_reg, pc_old_reg_next : pc_type;
 	signal pc_new_reg, pc_new_reg_next : pc_type;
-	--signal mem_in_reg, mem_in_reg_next : mem_in_type;
 	signal mem_op_reg, mem_op_reg_next : mem_op_type;
 	signal wrdata_reg, wrdata_reg_next : data_type;
 	signal zero_reg, zero_reg_next : std_logic;
@@ -103,7 +102,6 @@ begin
 			pc_old_reg <= ZERO_PC;
 			pc_new_reg <= ZERO_PC;
 			aluresult_reg <= ZERO_DATA;
-			--mem_in_reg <= MEM_IN_NOP;
 			mem_op_reg <= MEM_NOP;
 			wrdata_reg <= ZERO_DATA;
 			zero_reg <= '0';
@@ -113,7 +111,6 @@ begin
 			pc_old_reg <= pc_old_reg_next;
 			pc_new_reg <= pc_new_reg_next;
 			aluresult_reg <= aluresult_reg_next;
-			--mem_in_reg <= mem_in_reg_next;
 			mem_op_reg <= mem_op_reg_next;
 			wrdata_reg <= wrdata_reg_next;
 			zero_reg <= zero_reg_next;
@@ -129,7 +126,6 @@ begin
 		pc_old_reg_next <= pc_old_in;
 		pc_new_reg_next <= pc_new_in;
 		aluresult_reg_next <= aluresult_in;
-		--mem_in_reg_next <= mem_in;
 		mem_op_reg_next <= mem_op;
 		wrdata_reg_next <= wrdata;
 		zero_reg_next <= zero;
@@ -173,7 +169,6 @@ begin
 			pc_old_reg_next <= pc_old_reg;
 			pc_new_reg_next <= pc_new_reg;
 			aluresult_reg_next <= aluresult_reg;
-			--mem_in_reg_next <= mem_in_reg;
 			mem_op_reg_next <= mem_op_reg;
 			mem_op_reg_next.mem.memread <= '0';
 			mem_op_reg_next.mem.memwrite <= '0';
