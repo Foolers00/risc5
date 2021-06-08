@@ -11,11 +11,6 @@ loop:
 		nop
 		nop
 		sw x5, 16(x0)
-		nop
-		nop
-		lw x6, 16(x0)
-		nop
-		nop
 		jal x0, loop
 		nop
 		nop
