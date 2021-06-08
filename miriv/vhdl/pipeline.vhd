@@ -25,8 +25,8 @@ architecture impl of pipeline is
 	signal stall : std_logic;
 
 	signal if_ctrl_mem_busy : std_logic;
-	signal mem_cntrl_pcsrc : std_logic;
-	signal cntrl_if_pcsrc : std_logic;
+	signal mem_ctrl_pcsrc : std_logic;
+	signal ctrl_if_pcsrc : std_logic;
 	signal mem_if_pc : pc_type;
 	signal if_id_pc : pc_type;
 	signal if_id_instr : instr_type;
@@ -48,11 +48,11 @@ architecture impl of pipeline is
 	signal mem_wb_aluresult : data_type;
 	signal meme_wb_memresult : data_type;
 
-	signal cntrl_id_flush : std_logic;
-	signal cntrl_exec_flush : std_logic;
-	signal cntrl_if_flush : std_logic;
-	signal cntrl_mem_flush : std_logic;
-	signal cntrl_wb_flush : std_logic; 
+	signal ctrl_id_flush : std_logic;
+	signal ctrl_exec_flush : std_logic;
+	signal ctrl_if_flush : std_logic;
+	signal ctrl_mem_flush : std_logic;
+	signal ctrl_wb_flush : std_logic; 
 	
 	constant REG_WRITE_NOP : reg_write_type := (
 		write => '0',
@@ -232,11 +232,11 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => cntrl_if_flush,
+		flush => ctrl_if_flush,
 
 		mem_busy => if_ctrl_mem_busy,
 
-		pcsrc => cntrl_if_pcsrc,
+		pcsrc => ctrl_if_pcsrc,
 		pc_in => mem_if_pc,
 		pc_out => if_id_pc,
 		instr => if_id_instr,
@@ -250,7 +250,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => cntrl_id_flush,
+		flush => ctrl_id_flush,
 
 		pc_in => if_id_pc,
 		instr => if_id_instr,
@@ -269,7 +269,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => cntrl_exec_flush,
+		flush => ctrl_exec_flush,
 
 		op => id_ex_exec_op,
 		pc_in => id_ex_pc,
@@ -295,7 +295,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => cntrl_mem_flush,
+		flush => ctrl_mem_flush,
 
 		mem_busy => mem_ctrl_mem_busy,
 
@@ -310,7 +310,7 @@ begin
 		reg_write => open,
 
 		pc_new_out => mem_if_pc,
-		pcsrc => mem_cntrl_pcsrc,
+		pcsrc => mem_ctrl_pcsrc,
 
 		wbop_out => mem_wb_wbop,
 		pc_old_out => mem_wb_pc,
@@ -329,7 +329,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => cntrl_wb_flush,
+		flush => ctrl_wb_flush,
 
 		op => mem_wb_wbop,
 		aluresult => mem_wb_aluresult,
@@ -339,7 +339,7 @@ begin
 		reg_write => wb_id_reg_write
 	);
 
-	cntrl_inst : cntrl
+	ctrl_inst : ctrl
 	port map (
 		clk		=> clk,
 		res_n	=> res_n,
@@ -351,18 +351,18 @@ begin
 		stall_mem   => open,
 		stall_wb    => open,
 
-		flush_fetch => cntrl_if_flush,
-		flush_dec   => cntrl_id_flush,
-		flush_exec  => cntrl_exec_flush,
-		flush_mem   => cntrl_mem_flush,
-		flush_wb    => cntrl_wb_flush,
+		flush_fetch => ctrl_if_flush,
+		flush_dec   => ctrl_id_flush,
+		flush_exec  => ctrl_exec_flush,
+		flush_mem   => ctrl_mem_flush,
+		flush_wb    => ctrl_wb_flush,
 
 		-- from FWD
 		wb_op_exec  =>  ,
 		exec_op_dec =>  ,
 		
-		pcsrc_in 	=> mem_cntrl_pcsrc,
-		pcsrc_out 	=> cntrl_if_pcsrc
+		pcsrc_in 	=> mem_ctrl_pcsrc,
+		pcsrc_out 	=> ctrl_if_pcsrc
 
 	);
 
