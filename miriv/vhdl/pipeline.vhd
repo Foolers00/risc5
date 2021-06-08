@@ -22,10 +22,11 @@ end entity;
 
 architecture impl of pipeline is
 
-	signal stall, flush : std_logic;
+	signal stall : std_logic;
 
 	signal if_ctrl_mem_busy : std_logic;
-	signal mem_if_pcsrc : std_logic;
+	signal mem_cntrl_pcsrc : std_logic;
+	signal cntrl_if_pcsrc : std_logic;
 	signal mem_if_pc : pc_type;
 	signal if_id_pc : pc_type;
 	signal if_id_instr : instr_type;
@@ -40,13 +41,19 @@ architecture impl of pipeline is
 	signal ex_mem_wrdata : data_type;
 	signal ex_mem_zero : std_logic;
 	signal ex_mem_mem_op : mem_op_type;
-	signal ex_mem_wb_op : wb_op_type;
+	signal ex_mem_wbop : wb_op_type;
 	signal mem_ctrl_mem_busy : std_logic;
-	signal mem_wb_wb_op : wb_op_type;
+	signal mem_wb_wbop : wb_op_type;
 	signal mem_wb_pc : pc_type;
 	signal mem_wb_aluresult : data_type;
 	signal meme_wb_memresult : data_type;
 
+	signal cntrl_id_flush : std_logic;
+	signal cntrl_exec_flush : std_logic;
+	signal cntrl_if_flush : std_logic;
+	signal cntrl_mem_flush : std_logic;
+	signal cntrl_wb_flush : std_logic; 
+	
 	constant REG_WRITE_NOP : reg_write_type := (
 		write => '0',
 		reg => ZERO_REG,
@@ -190,6 +197,33 @@ architecture impl of pipeline is
 		);
 	end component;
 
+	component ctrl is
+		port (
+			clk         : in std_logic;
+			res_n       : in std_logic;
+			stall       : in std_logic;
+	
+			stall_fetch : out std_logic;
+			stall_dec   : out std_logic;
+			stall_exec  : out std_logic;
+			stall_mem   : out std_logic;
+			stall_wb    : out std_logic;
+	
+			flush_fetch : out std_logic;
+			flush_dec   : out std_logic;
+			flush_exec  : out std_logic;
+			flush_mem   : out std_logic;
+			flush_wb    : out std_logic;
+	
+			-- from FWD
+			wb_op_exec  : in  wb_op_type;
+			exec_op_dec : in  exec_op_type;
+	
+			pcsrc_in : in std_logic;
+			pcsrc_out : out std_logic
+		);
+	end component;
+
 begin
 
 
@@ -198,11 +232,11 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => flush,
+		flush => cntrl_if_flush,
 
 		mem_busy => if_ctrl_mem_busy,
 
-		pcsrc => mem_if_pcsrc,
+		pcsrc => cntrl_if_pcsrc,
 		pc_in => mem_if_pc,
 		pc_out => if_id_pc,
 		instr => if_id_instr,
@@ -216,7 +250,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => flush,
+		flush => cntrl_id_flush,
 
 		pc_in => if_id_pc,
 		instr => if_id_instr,
@@ -235,7 +269,7 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => flush,
+		flush => cntrl_exec_flush,
 
 		op => id_ex_exec_op,
 		pc_in => id_ex_pc,
@@ -249,7 +283,7 @@ begin
 		memop_in => id_ex_mem_op,
 		memop_out => ex_mem_mem_op,
 		wbop_in => id_ex_wb_op,
-		wbop_out => ex_mem_wb_op,
+		wbop_out => ex_mem_wbop,
 
 		exec_op => open,
 		reg_write_mem => REG_WRITE_NOP,
@@ -261,12 +295,12 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => flush,
+		flush => cntrl_mem_flush,
 
 		mem_busy => mem_ctrl_mem_busy,
 
 		mem_op => ex_mem_mem_op,
-		wbop_in => ex_mem_wb_op,
+		wbop_in => ex_mem_wbop,
 		pc_new_in => ex_mem_pc_new,
 		pc_old_in => ex_mem_pc_old,
 		aluresult_in => ex_mem_aluresult,
@@ -276,9 +310,9 @@ begin
 		reg_write => open,
 
 		pc_new_out => mem_if_pc,
-		pcsrc => mem_if_pcsrc,
+		pcsrc => mem_cntrl_pcsrc,
 
-		wbop_out => mem_wb_wb_op,
+		wbop_out => mem_wb_wbop,
 		pc_old_out => mem_wb_pc,
 		aluresult_out => mem_wb_aluresult,
 		memresult => meme_wb_memresult,
@@ -295,9 +329,9 @@ begin
 		clk => clk,
 		res_n => res_n,
 		stall => stall,
-		flush => flush,
+		flush => cntrl_wb_flush,
 
-		op => mem_wb_wb_op,
+		op => mem_wb_wbop,
 		aluresult => mem_wb_aluresult,
 		memresult => meme_wb_memresult,
 		pc_old_in => mem_wb_pc,
@@ -305,7 +339,34 @@ begin
 		reg_write => wb_id_reg_write
 	);
 
-	flush <= '0';
+	cntrl_inst : cntrl
+	port map (
+		clk		=> clk,
+		res_n	=> res_n,
+		stall	=> stall,
+
+		stall_fetch => open,
+		stall_dec   => open, 
+		stall_exec  => open,
+		stall_mem   => open,
+		stall_wb    => open,
+
+		flush_fetch => cntrl_if_flush,
+		flush_dec   => cntrl_id_flush,
+		flush_exec  => cntrl_exec_flush,
+		flush_mem   => cntrl_mem_flush,
+		flush_wb    => cntrl_wb_flush,
+
+		-- from FWD
+		wb_op_exec  =>  ,
+		exec_op_dec =>  ,
+		
+		pcsrc_in 	=> mem_cntrl_pcsrc,
+		pcsrc_out 	=> cntrl_if_pcsrc
+
+	);
+
+	--flush <= '0';
 
 	stall <= mem_ctrl_mem_busy or if_ctrl_mem_busy;
 
