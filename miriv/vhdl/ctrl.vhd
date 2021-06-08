@@ -33,5 +33,49 @@ entity ctrl is
 end entity;
 
 architecture rtl of ctrl is
+
 begin
+
+
+	async : process (all)
+	begin
+		-- Output
+		stall_fetch <= '0';
+		stall_dec <= '0';
+		stall_exec <= '0';
+		stall_mem <= '0';
+		stall_wb <= '0';
+
+		flush_fetch <= '0';
+		flush_dec <= '0';
+		flush_exec <= '0';
+		flush_mem <= '0';
+		flush_wb <= '0';
+
+		pcsrc_out <= pcsrc_in;
+
+		if wb_op_exec.src = WBS_OPC or not res_n then
+			flush_fetch <= '1';
+			flush_dec <= '1';
+			flush_exec <= '1';
+			flush_mem <= '1';
+			flush_wb <= '1';
+		end if;
+
+		if stall or  then
+			stall_fetch <= '1';
+			stall_dec <= '1';
+			stall_exec <= '1';
+			stall_mem <= '1';
+			stall_wb <= '1';
+		
+		else
+			if (wb_op_exec.src = WBS_MEM and unsigned(wb_op_exec_rd) /= 0 and 
+			(exec_op_dec.rs1 = wb_op_exec.rd or exec_op_dec.rs2 = wb_op_exec.rd)) then
+				stall_fetch <= '1';
+				stall_dec <= '1';
+			end if;
+		end if;
+
+	end process;
 end architecture;

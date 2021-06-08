@@ -53,6 +53,12 @@ architecture impl of pipeline is
 	signal ctrl_if_flush : std_logic;
 	signal ctrl_mem_flush : std_logic;
 	signal ctrl_wb_flush : std_logic; 
+
+	signal ctrl_id_stall : std_logic;
+	signal ctrl_exec_stall : std_logic;
+	signal ctrl_if_stall : std_logic;
+	signal ctrl_mem_stall : std_logic;
+	signal ctrl_wb_stall : std_logic; 
 	
 	constant REG_WRITE_NOP : reg_write_type := (
 		write => '0',
@@ -231,7 +237,7 @@ begin
 	port map(
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
+		stall => ctrl_if_stall,
 		flush => ctrl_if_flush,
 
 		mem_busy => if_ctrl_mem_busy,
@@ -249,7 +255,7 @@ begin
 	port map(
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
+		stall => ctrl_id_stall,
 		flush => ctrl_id_flush,
 
 		pc_in => if_id_pc,
@@ -268,7 +274,7 @@ begin
 	port map(
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
+		stall => ctrl_exec_stall,
 		flush => ctrl_exec_flush,
 
 		op => id_ex_exec_op,
@@ -294,7 +300,7 @@ begin
 	port map(
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
+		stall => ctrl_mem_stall,
 		flush => ctrl_mem_flush,
 
 		mem_busy => mem_ctrl_mem_busy,
@@ -328,7 +334,7 @@ begin
 	port map(
 		clk => clk,
 		res_n => res_n,
-		stall => stall,
+		stall => ctrl_wb_stall,
 		flush => ctrl_wb_flush,
 
 		op => mem_wb_wbop,
@@ -345,11 +351,11 @@ begin
 		res_n	=> res_n,
 		stall	=> stall,
 
-		stall_fetch => open,
-		stall_dec   => open, 
-		stall_exec  => open,
-		stall_mem   => open,
-		stall_wb    => open,
+		stall_fetch => ctrl_if_stall,
+		stall_dec   => ctrl_id_stall, 
+		stall_exec  => ctrl_exec_stall,
+		stall_mem   => ctrl_mem_stall,
+		stall_wb    => ctrl_wb_stall,
 
 		flush_fetch => ctrl_if_flush,
 		flush_dec   => ctrl_id_flush,
