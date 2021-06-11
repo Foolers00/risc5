@@ -23,4 +23,15 @@ package cache_pkg is
 		replace : std_logic;
 		tag : c_tag_type;
 	end record;
+
+	type cache_state_t is (
+		IDLE,
+		READ_CACHE,
+		READ_MEM_START,
+		READ_MEM,
+		WRITE_BACK_START,
+		WRITE_BACK
+	);
+
+
 end package;
