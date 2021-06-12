@@ -70,7 +70,7 @@ architecture rtl of mem is
 		reg => ZERO_REG,
 		data => ZERO_DATA
 	);
-	
+
 	signal wbop_reg, wbop_reg_next : wb_op_type;
 	signal aluresult_reg, aluresult_reg_next : data_type;
 	signal pc_old_reg, pc_old_reg_next : pc_type;
@@ -85,12 +85,12 @@ begin
 	memu_inst : memu
 	port map (
 		op  => mem_op_reg.mem,
-		A   => aluresult_reg, 
+		A   => aluresult_reg,
 		W   => wrdata_reg,
 		R   => memresult,
 		B   => mem_busy,
 		XL  => exc_load,
-		XS  => exc_store, 
+		XS  => exc_store,
 		D   => mem_in,
 		M   => mem_out
 	);
@@ -137,6 +137,21 @@ begin
 		aluresult_out <= aluresult_reg;
 		pcsrc <= '0';
 
+		--output for forwarding
+		reg_write.write <= wbop_reg.write;
+		reg_write.reg <= wbop_reg.write;
+		case wbop_reg.src is
+			when WBS_ALU =>
+				reg_write.data <= aluresult_reg;
+			when WBS_MEM =>
+				-- this case can't occur because the control unit inserts nops for these kind of hazards
+				reg_write.data <= ZERO_DATA;
+			when WBS_OPC =>
+				-- write back programm counter of next instruction (only used for jal and jalr instructions)
+				reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_reg) + 4));
+		end case;
+
+
 		if flush then
 			wbop_out <= WB_NOP;
 			pc_old_out <= pc_old_reg;
@@ -144,7 +159,7 @@ begin
 			aluresult_out <= ZERO_DATA;
 
 		else
-			
+
 			case mem_op_reg.branch is
 				when BR_NOP =>
 					pcsrc <= '0';
@@ -160,7 +175,7 @@ begin
 					if zero_reg then
 						pcsrc <= '1';
 					end if;
-			end case;			
+			end case;
 		end if;
 
 		-- Old Register Input
@@ -175,7 +190,7 @@ begin
 			wrdata_reg_next <= wrdata_reg;
 			zero_reg_next <= zero_reg;
 		end if;
-		
+
 	end process;
 
 	reg_write <= REG_WRITE_NOP;
