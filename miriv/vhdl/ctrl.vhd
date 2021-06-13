@@ -54,12 +54,10 @@ begin
 
 		pcsrc_out <= pcsrc_in;
 
-		if wb_op_exec.src = WBS_OPC or not res_n then
+		if pcsrc_in or not res_n then
 			flush_fetch <= '1';
 			flush_dec <= '1';
 			flush_exec <= '1';
-			flush_mem <= '1';
-			flush_wb <= '1';
 		end if;
 
 		if stall or  then
@@ -70,7 +68,7 @@ begin
 			stall_wb <= '1';
 		
 		else
-			if (wb_op_exec.src = WBS_MEM and unsigned(wb_op_exec_rd) /= 0 and 
+			if (wb_op_exec.src = WBS_MEM and wb_op_exec_rd /= ZERO_REG and 
 			(exec_op_dec.rs1 = wb_op_exec.rd or exec_op_dec.rs2 = wb_op_exec.rd)) then
 				stall_fetch <= '1';
 				stall_dec <= '1';
