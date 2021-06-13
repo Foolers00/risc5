@@ -58,6 +58,9 @@ architecture rtl of exec is
 
 	signal alu_A, alu_B : data_type;
 
+	signal fwd_A_val, fwd_B_val : data_type;
+	signal fwd_A_do_fwd, fwd_B_do_fwd : std_logic;
+
 
 
 begin
@@ -79,6 +82,24 @@ begin
 		B => pc_add_B,
 		R => temp_pc_new_out,
 		Z => open
+	);
+
+	fwd_A_inst : fwd
+	port map (
+		reg_write_mem => reg_write_mem,
+		reg_write_wb => reg_write_wr,
+		reg => exec_op_reg.rs1,
+		val => fwd_A_val,
+		do_fwd => fwd_A_do_fwd
+	);
+
+	fwd_B_inst : fwd
+	port map (
+		reg_write_mem => reg_write_mem,
+		reg_write_wb => reg_write_wr,
+		reg => exec_op_reg.rs2,
+		val => fwd_B_val,
+		do_fwd => fwd_B_do_fwd
 	);
 
 	sync : process (clk, res_n)
@@ -103,12 +124,18 @@ begin
 		--define inputs of ALU
 		if exec_op_reg.alusrc1 = '0' then
 			alu_A <= exec_op_reg.readdata1;
+			if fwd_A_do_fwd = '1' then
+				alu_A <= fwd_A_val;
+			end if;
 		else
 			alu_A <= to_data_type(pc_old_reg);
 		end if;
 
 		if exec_op_reg.alusrc2 = '0' then
 			alu_B <= exec_op_reg.readdata2;
+			if fwd_B_do_fwd = '1' then
+				alu_B <= fwd_B_val;
+			end if;
 		else
 			alu_B <= exec_op_reg.imm;
 		end if;
@@ -131,7 +158,7 @@ begin
 		pc_old_out <= pc_old_reg;
 		pc_new_out <= to_pc_type(data => temp_pc_new_out);
 		wrdata <= exec_op_reg.readdata2;
-		
+
 
 		if flush then
 			wbop_out <= WB_NOP;

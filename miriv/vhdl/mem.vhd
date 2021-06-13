@@ -140,17 +140,7 @@ begin
 		--output for forwarding
 		reg_write.write <= wbop_reg.write;
 		reg_write.reg <= wbop_reg.write;
-		case wbop_reg.src is
-			when WBS_ALU =>
-				reg_write.data <= aluresult_reg;
-			when WBS_MEM =>
-				-- this case can't occur because the control unit inserts nops for these kind of hazards
-				reg_write.data <= ZERO_DATA;
-			when WBS_OPC =>
-				-- write back programm counter of next instruction (only used for jal and jalr instructions)
-				reg_write.data <= to_data_type(std_logic_vector(unsigned(pc_old_reg) + 4));
-		end case;
-
+		reg_write.data <= aluresult_reg;
 
 		if flush then
 			wbop_out <= WB_NOP;
