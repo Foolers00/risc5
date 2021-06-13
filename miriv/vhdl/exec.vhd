@@ -46,6 +46,16 @@ architecture rtl of exec is
 		);
 	end component;
 
+	component fwd is
+		port (
+			reg_write_mem : in reg_write_type;
+			reg_write_wb  : in reg_write_type;
+			reg    : in  reg_adr_type;
+			val    : out data_type;
+			do_fwd : out std_logic
+		);
+	end component;
+
 
 
 	signal wbop_reg, wbop_reg_next : wb_op_type;

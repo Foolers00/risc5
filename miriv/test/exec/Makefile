@@ -7,6 +7,7 @@ VHDL_FILES = \
 	../../vhdl/core_pkg.vhd\
 	../../vhdl/op_pkg.vhd\
 	../../vhdl/alu.vhd\
+	../../vhdl/fwd.vhd\
 	../../vhdl/exec.vhd\
 	../tb_util_pkg.vhd
 	
