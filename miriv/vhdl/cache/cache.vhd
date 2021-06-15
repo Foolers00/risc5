@@ -250,10 +250,11 @@ begin
 						-- SETTING CACHE WRITE SIGNALS
 						mgmt_index <= mem_out_cpu.address(INDEX_SIZE-1 downto 0);
 						mgmt_tag_in <= mem_out_cpu.address(TAG_SIZE-1+INDEX_SIZE downto INDEX_SIZE);
-						mgmt_wr <= '1';
+						mgmt_rd <= '1';
 						if mgmt_hit_out then
 							mgmt_valid_in <= '1';
 							mgmt_dirty_in <= '1';
+							mgmt_wr <= '1';
 							
 							data_we <= '1';
 							data_index <= mem_out_cpu.address(INDEX_SIZE-1 downto 0);
