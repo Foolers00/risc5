@@ -25,7 +25,7 @@ end entity;
 
 architecture impl of data_st_1w is
 	
-	signal ram_we_byte_0, ram_we_byte_1, ram_we_byte_2, ram_we_byte_4 : std_logic;
+	signal ram_we_byte_0, ram_we_byte_1, ram_we_byte_2, ram_we_byte_3 : std_logic;
 	signal rd_reg, rd_reg_next : std_logic;
 	signal data_temp_out : mem_data_type;
 
