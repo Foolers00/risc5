@@ -47,19 +47,20 @@ architecture impl of pipeline is
 	signal mem_wb_pc : pc_type;
 	signal mem_wb_aluresult : data_type;
 	signal meme_wb_memresult : data_type;
+	signal mem_ex_reg_write: reg_write_type;
 
 	signal ctrl_id_flush : std_logic;
 	signal ctrl_exec_flush : std_logic;
 	signal ctrl_if_flush : std_logic;
 	signal ctrl_mem_flush : std_logic;
-	signal ctrl_wb_flush : std_logic; 
+	signal ctrl_wb_flush : std_logic;
 
 	signal ctrl_id_stall : std_logic;
 	signal ctrl_exec_stall : std_logic;
 	signal ctrl_if_stall : std_logic;
 	signal ctrl_mem_stall : std_logic;
-	signal ctrl_wb_stall : std_logic; 
-	
+	signal ctrl_wb_stall : std_logic;
+
 	constant REG_WRITE_NOP : reg_write_type := (
 		write => '0',
 		reg => ZERO_REG,
@@ -208,23 +209,23 @@ architecture impl of pipeline is
 			clk         : in std_logic;
 			res_n       : in std_logic;
 			stall       : in std_logic;
-	
+
 			stall_fetch : out std_logic;
 			stall_dec   : out std_logic;
 			stall_exec  : out std_logic;
 			stall_mem   : out std_logic;
 			stall_wb    : out std_logic;
-	
+
 			flush_fetch : out std_logic;
 			flush_dec   : out std_logic;
 			flush_exec  : out std_logic;
 			flush_mem   : out std_logic;
 			flush_wb    : out std_logic;
-	
+
 			-- from FWD
 			wb_op_exec  : in  wb_op_type;
 			exec_op_dec : in  exec_op_type;
-	
+
 			pcsrc_in : in std_logic;
 			pcsrc_out : out std_logic
 		);
@@ -292,8 +293,8 @@ begin
 		wbop_out => ex_mem_wbop,
 
 		exec_op => open,
-		reg_write_mem => REG_WRITE_NOP,
-		reg_write_wr => REG_WRITE_NOP
+		reg_write_mem => mem_ex_reg_write,
+		reg_write_wr => wb_id_reg_write
 	);
 
 	memory_inst : mem
@@ -352,7 +353,7 @@ begin
 		stall	=> stall,
 
 		stall_fetch => ctrl_if_stall,
-		stall_dec   => ctrl_id_stall, 
+		stall_dec   => ctrl_id_stall,
 		stall_exec  => ctrl_exec_stall,
 		stall_mem   => ctrl_mem_stall,
 		stall_wb    => ctrl_wb_stall,
@@ -364,9 +365,9 @@ begin
 		flush_wb    => ctrl_wb_flush,
 
 		-- from FWD
-		wb_op_exec  =>  ,
-		exec_op_dec =>  ,
-		
+		wb_op_exec  =>  ex_mem_wbop,
+		exec_op_dec =>  id_ex_exec_op,
+
 		pcsrc_in 	=> mem_ctrl_pcsrc,
 		pcsrc_out 	=> ctrl_if_pcsrc
 

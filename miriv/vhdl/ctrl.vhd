@@ -54,6 +54,7 @@ begin
 
 		pcsrc_out <= pcsrc_in;
 
+		--ASKTUTOR
 		if pcsrc_in or not res_n then
 			flush_fetch <= '1';
 			flush_dec <= '1';
@@ -66,9 +67,9 @@ begin
 			stall_exec <= '1';
 			stall_mem <= '1';
 			stall_wb <= '1';
-		
+
 		else
-			if (wb_op_exec.src = WBS_MEM and wb_op_exec.rd /= ZERO_REG and 
+			if (wb_op_exec.src = WBS_MEM and wb_op_exec.rd /= ZERO_REG and
 			(exec_op_dec.rs1 = wb_op_exec.rd or exec_op_dec.rs2 = wb_op_exec.rd)) then
 				stall_fetch <= '1';
 				stall_dec <= '1';

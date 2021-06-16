@@ -29,7 +29,7 @@ entity exec is
 		wbop_out      : out wb_op_type;
 
 		-- FWD
-		exec_op       : out exec_op_type;
+		exec_op       : out exec_op_type; --ASKTUTOR
 		reg_write_mem : in  reg_write_type;
 		reg_write_wr  : in  reg_write_type
 	);
