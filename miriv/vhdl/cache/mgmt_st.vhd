@@ -85,7 +85,7 @@ begin
 		mgmt_1w_repl <= '0';		
 
 		if rd then
-			if tag_in = tag_out then
+			if tag_in = mgmt_info_out.tag then
 				hit_out <= '1';
 			end if;
 			valid_out <= mgmt_info_out.valid;
