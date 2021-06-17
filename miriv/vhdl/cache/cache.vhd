@@ -91,6 +91,8 @@ architecture impl of cache is
 	--signal mem_in_mem_reg, mem_in_mem_reg_next : mem_in_type;
 	signal mem_rddata_reg, mem_rddata_reg_next : mem_data_type;
 	signal wrback_mem_out_reg, wrback_mem_out_reg_next : mem_out_type;
+	signal is_dirty_reg, is_dirty_reg_next : std_logic;
+	signal is_tag_diff_reg, is_tag_diff_reg_next : std_logic;
 
 
 	--mgmt signals 
@@ -163,6 +165,8 @@ begin
 			mem_out_cpu_reg <= MEM_OUT_NOP;
 			mem_rddata_reg <= (others => '0');
 			wrback_mem_out_reg <= MEM_OUT_NOP;
+			is_dirty_reg <= '0';
+			is_tag_diff_reg <= '0';
 
 		elsif rising_edge(clk) then
 			state_reg <= state_reg_next;
@@ -170,6 +174,8 @@ begin
 			mem_out_cpu_reg <= mem_out_cpu_reg_next;
 			mem_rddata_reg <= mem_rddata_reg_next;
 			wrback_mem_out_reg <= wrback_mem_out_reg_next;
+			is_dirty_reg <= is_dirty_reg_next;
+			is_tag_diff_reg <= is_tag_diff_reg_next;
 		end if;
 
 	end process;
@@ -183,6 +189,8 @@ begin
 		mem_out_cpu_reg_next <= mem_out_cpu_reg;
 		mem_rddata_reg_next <= mem_rddata_reg;
 		wrback_mem_out_reg_next <= wrback_mem_out_reg;
+		is_dirty_reg_next <= is_dirty_reg;
+		is_tag_diff_reg_next <= is_tag_diff_reg;
 
 		-- mgmt signals
 		mgmt_index <= (others => '0');
@@ -227,14 +235,18 @@ begin
 						mgmt_index <= mem_out_cpu.address(INDEX_SIZE-1 downto 0);
 						mgmt_rd <= '1';
 						if mgmt_hit_out and mgmt_valid_out then
+							is_dirty_reg_next <= mgmt_dirty_out;
+
 							if mgmt_tag_out = mem_out_cpu.address(TAG_SIZE-1+INDEX_SIZE downto INDEX_SIZE) then
 								-- SETTING DATA CACHE READ SIGNALS
 								data_rd <= '1';
 								data_index <= mem_out_cpu.address(INDEX_SIZE-1 downto 0);
 								data_byteena <= mem_out_cpu.byteena;
 								state_reg_next <= READ_CACHE;
+								is_tag_diff_reg_next <= '0';
 							else
 								state_reg_next <= READ_MEM_START;
+								is_tag_diff_reg_next <= '1';
 							end if;
 						else
 							state_reg_next <= READ_MEM_START;
@@ -268,7 +280,7 @@ begin
 				end if;
 			
 			when READ_CACHE =>
-				mem_in_cpu.busy <= '1';
+				mem_in_cpu.busy <= '0';
 				mem_in_cpu.rddata <= data_out;
 				state_reg_next <= IDLE;
 				
@@ -282,19 +294,10 @@ begin
 				if not mem_in_mem.busy then
 					if not is_caching_reg then
 						mem_in_cpu <= mem_in_mem;
+						mem_in_cpu.busy <= '0';
 						state_reg_next <= IDLE;
 					else
 						mem_rddata_reg_next <= mem_in_mem.rddata;
-						
-						mgmt_index <= mem_out_cpu_reg.address(INDEX_SIZE-1 downto 0);
-						mgmt_rd <= '1';
-
-
-						-- CACHE NEW MGMT INFORMATION WRITE ACCESS
-						mgmt_wr <= '1';
-						mgmt_valid_in <= '1';
-						mgmt_dirty_in <= '0';
-						mgmt_tag_in <= mem_out_cpu_reg.address(TAG_SIZE-1+INDEX_SIZE downto INDEX_SIZE);
 						
 						-- CACHE NEW DATA WRITE ACCESS
 						data_we <= '1';
@@ -302,7 +305,20 @@ begin
 						data_byteena <= mem_out_cpu_reg.byteena;
 						data_in <= mem_in_mem.rddata;
 
-						if mgmt_dirty_out then
+						-- CACHE NEW MGMT INFORMATION WRITE ACCESS
+						mgmt_wr <= '1';
+						mgmt_valid_in <= '1';
+						mgmt_dirty_in <= '0';
+						mgmt_tag_in <= mem_out_cpu_reg.address(TAG_SIZE-1+INDEX_SIZE downto INDEX_SIZE);
+
+						if is_dirty_reg and not is_tag_diff_reg then
+
+							-- SET DIRTY
+							mgmt_dirty_in <= '1';
+							state_reg_next <= IDLE;
+
+						elsif is_dirty_reg and is_tag_diff_reg then
+
 							-- CACHE OLD DATA READ ACCESS
 							data_rd <= '1';
 							data_index <= mem_out_cpu_reg.address(INDEX_SIZE-1 downto 0);
@@ -328,10 +344,14 @@ begin
 				state_reg_next <= WRITE_BACK;
 
 
-			when WRITE_BACK => 
-				mem_in_cpu.busy <= '0';
-				mem_in_cpu.rddata <= mem_rddata_reg;
-				state_reg_next <= IDLE;
+			when WRITE_BACK =>
+				if mem_in_mem.busy then
+					mem_in_cpu.busy <= '1';
+				else
+					mem_in_cpu.rddata <= mem_rddata_reg;
+					mem_in_cpu.busy <= '0';
+					state_reg_next <= IDLE;
+				end if;
 
 			when others =>
 
