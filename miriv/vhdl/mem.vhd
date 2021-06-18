@@ -140,7 +140,7 @@ begin
 		--output for forwarding
 		--ASKTUTOR
 		reg_write.write <= wbop_reg.write;
-		reg_write.reg <= wbop_reg.write;
+		reg_write.reg <= wbop_reg.rd;
 		reg_write.data <= aluresult_reg;
 
 		if flush then
