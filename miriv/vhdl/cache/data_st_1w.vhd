@@ -32,7 +32,7 @@ architecture impl of data_st_1w is
 begin
 	ram_byte_0_inst : single_clock_rw_ram
 	generic map (
-		ADDR_WIDTH	=> 2**(SETS_LD-1),
+		ADDR_WIDTH	=> SETS_LD,
 		DATA_WIDTH 	=> BYTE_WIDTH	
 	)
 	port map (
@@ -46,7 +46,7 @@ begin
 
 	ram_byte_1_inst : single_clock_rw_ram
 	generic map (
-		ADDR_WIDTH	=> 2**(SETS_LD-1),
+		ADDR_WIDTH	=> SETS_LD,
 		DATA_WIDTH 	=> BYTE_WIDTH	
 	)
 	port map (
@@ -60,7 +60,7 @@ begin
 
 	ram_byte_2_inst : single_clock_rw_ram
 	generic map (
-		ADDR_WIDTH	=> 2**(SETS_LD-1),
+		ADDR_WIDTH	=> SETS_LD,
 		DATA_WIDTH 	=> BYTE_WIDTH	
 	)
 	port map (
@@ -74,7 +74,7 @@ begin
 
 	ram_byte_3_inst : single_clock_rw_ram
 	generic map (
-		ADDR_WIDTH	=> 2**(SETS_LD-1),
+		ADDR_WIDTH	=> SETS_LD,
 		DATA_WIDTH 	=> BYTE_WIDTH	
 	)
 	port map (

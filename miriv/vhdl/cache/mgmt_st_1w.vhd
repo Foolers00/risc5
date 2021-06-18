@@ -32,7 +32,7 @@ begin
 
 	sync : process (clk, res_n)
 	begin
-		if res_n then
+		if not res_n then
 			for i in 0 to 2**(SETS_LD)-1 loop
 				mgmt_info_reg(i).valid <= '0';
 			end loop;
@@ -47,7 +47,8 @@ begin
 	async : process (all)
 	begin
 		mgmt_info_out <= mgmt_info_reg(to_integer(unsigned(index)));
-		if we then
+		mgmt_info_reg_next <= mgmt_info_reg;
+		if we = '1' then
 			mgmt_info_reg_next(to_integer(unsigned(index))) <= mgmt_info_in;
 		end if;
 	end process;

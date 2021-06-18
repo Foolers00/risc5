@@ -81,7 +81,7 @@ begin
 		mgmt_info_in.valid <= valid_in;
 		mgmt_info_in.dirty <= dirty_in;
 		mgmt_info_in.tag <= tag_in;
-		mgmt_1w_we <= '0';
+		mgmt_1w_we <= wr;
 		mgmt_1w_repl <= '0';		
 
 		if rd then
@@ -93,9 +93,7 @@ begin
 			tag_out <= mgmt_info_out.tag;
 		end if;
 
-		if wr then
-			mgmt_1w_we <= '1';
-		end if;
+		
 	end process;
 
 
