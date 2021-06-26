@@ -124,6 +124,10 @@ begin
 			mem_op_reg <= mem_op_reg_next;
 			pc_old_reg <= pc_old_reg_next;
 			exec_op_reg <= exec_op_reg_next;
+			if flush = '1' then
+				wbop_reg <= WB_NOP;
+				mem_op_reg <= MEM_NOP;
+			end if;
 		end if;
 	end process;
 
@@ -170,13 +174,13 @@ begin
 		wrdata <= exec_op_reg.readdata2;
 
 
-		if flush then
-			wbop_out <= WB_NOP;
-			memop_out <= MEM_NOP;
-			pc_old_out <= pc_old_reg;
-			pc_new_out <= pc_old_reg;
-			wrdata <= ZERO_DATA;
-		end if;
+		-- if flush then
+		-- 	wbop_out <= WB_NOP;
+		-- 	memop_out <= MEM_NOP;
+		-- 	pc_old_out <= pc_old_reg;
+		-- 	pc_new_out <= pc_old_reg;
+		-- 	wrdata <= ZERO_DATA;
+		-- end if;
 
 		-- Old Register Input
 		if stall then

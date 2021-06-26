@@ -55,10 +55,19 @@ begin
 		pcsrc_out <= pcsrc_in;
 
 		--ASKTUTOR
-		if pcsrc_in or not res_n then
+		-- TODO flush dec, exec, mem
+		if pcsrc_in then
 			flush_fetch <= '1';
 			flush_dec <= '1';
 			flush_exec <= '1';
+		end if;
+
+		if res_n = '0' then
+			flush_fetch <= '1';
+			flush_dec <= '1';
+			flush_exec <= '1';
+			flush_mem <= '1';
+			flush_wb <= '1';
 		end if;
 
 		if stall then
@@ -69,10 +78,12 @@ begin
 			stall_wb <= '1';
 
 		else
+			--TODO flush exec
 			if (wb_op_exec.src = WBS_MEM and wb_op_exec.rd /= ZERO_REG and
 			(exec_op_dec.rs1 = wb_op_exec.rd or exec_op_dec.rs2 = wb_op_exec.rd)) then
 				stall_fetch <= '1';
 				stall_dec <= '1';
+				flush_exec <= '1';
 			end if;
 		end if;
 
