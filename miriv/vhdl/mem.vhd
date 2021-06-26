@@ -184,6 +184,4 @@ begin
 
 	end process;
 
-	reg_write <= REG_WRITE_NOP;
-
 end architecture;
