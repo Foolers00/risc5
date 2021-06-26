@@ -47,7 +47,7 @@ architecture impl of pipeline is
 	signal mem_wb_pc : pc_type;
 	signal mem_wb_aluresult : data_type;
 	signal meme_wb_memresult : data_type;
-	signal mem_ex_reg_write: reg_write_type;
+	signal mem_ex_reg_write : reg_write_type;
 
 	signal ctrl_id_flush : std_logic;
 	signal ctrl_exec_flush : std_logic;
@@ -314,7 +314,7 @@ begin
 		wrdata => ex_mem_wrdata,
 		zero => ex_mem_zero,
 
-		reg_write => open,
+		reg_write => mem_ex_reg_write,
 
 		pc_new_out => mem_if_pc,
 		pcsrc => mem_ctrl_pcsrc,
