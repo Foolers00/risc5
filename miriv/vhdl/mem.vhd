@@ -140,36 +140,26 @@ begin
 		pcsrc <= '0';
 
 		--output for forwarding
-		--ASKTUTOR
 		reg_write.write <= wbop_reg.write;
 		reg_write.reg <= wbop_reg.rd;
 		reg_write.data <= aluresult_reg;
 
-		-- if flush then
-		-- 	wbop_out <= WB_NOP;
-		-- 	pc_old_out <= pc_old_reg;
-		-- 	pc_new_out <= pc_new_reg;
-		-- 	aluresult_out <= ZERO_DATA;
-		--
-		-- else
-		if not flush then
-			case mem_op_reg.branch is
-				when BR_NOP =>
-					pcsrc <= '0';
-				when BR_BR =>
+		case mem_op_reg.branch is
+			when BR_NOP =>
+				pcsrc <= '0';
+			when BR_BR =>
+				pcsrc <= '1';
+			when BR_CND =>
+				pcsrc <= '0';
+				if not zero_reg then
 					pcsrc <= '1';
-				when BR_CND =>
-					pcsrc <= '0';
-					if not zero_reg then
-						pcsrc <= '1';
-					end if;
-				when BR_CNDI =>
-					pcsrc <= '0';
-					if zero_reg then
-						pcsrc <= '1';
-					end if;
-			end case;
-		end if;
+				end if;
+			when BR_CNDI =>
+				pcsrc <= '0';
+				if zero_reg then
+					pcsrc <= '1';
+				end if;
+		end case;
 
 		-- Old Register Input
 		if stall then
