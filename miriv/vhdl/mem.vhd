@@ -114,7 +114,9 @@ begin
 			mem_op_reg <= mem_op_reg_next;
 			wrdata_reg <= wrdata_reg_next;
 			zero_reg <= zero_reg_next;
-
+			if flush = '1' then
+					wbop_reg <= WB_NOP;
+			end if;
 		end if;
 	end process;
 
@@ -143,14 +145,14 @@ begin
 		reg_write.reg <= wbop_reg.rd;
 		reg_write.data <= aluresult_reg;
 
-		if flush then
-			wbop_out <= WB_NOP;
-			pc_old_out <= pc_old_reg;
-			pc_new_out <= pc_new_reg;
-			aluresult_out <= ZERO_DATA;
-
-		else
-
+		-- if flush then
+		-- 	wbop_out <= WB_NOP;
+		-- 	pc_old_out <= pc_old_reg;
+		-- 	pc_new_out <= pc_new_reg;
+		-- 	aluresult_out <= ZERO_DATA;
+		--
+		-- else
+		if not flush then
 			case mem_op_reg.branch is
 				when BR_NOP =>
 					pcsrc <= '0';

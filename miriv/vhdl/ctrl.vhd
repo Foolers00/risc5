@@ -54,12 +54,13 @@ begin
 
 		pcsrc_out <= pcsrc_in;
 
-		--ASKTUTOR
-		-- TODO flush dec, exec, mem
+		-- when branch occurs the following 3 instructions need to be flushed
+		-- flush signal is registered in dec, ex and mem stage
+		-- therefore dec, ex, mem need to be flushed instead of fetch, dec, ex
 		if pcsrc_in then
-			flush_fetch <= '1';
 			flush_dec <= '1';
 			flush_exec <= '1';
+			flush_mem <= '1';
 		end if;
 
 		if res_n = '0' then
