@@ -94,6 +94,8 @@ begin
 		Z => open
 	);
 
+	-- fwd unit for rs1
+	-- used for input A of alu and pc adder
 	fwd_A_inst : fwd
 	port map (
 		reg_write_mem => reg_write_mem,
@@ -103,6 +105,8 @@ begin
 		do_fwd => fwd_A_do_fwd
 	);
 
+	-- fwd unit for rs2
+	-- used for input b of alu and wrdata
 	fwd_B_inst : fwd
 	port map (
 		reg_write_mem => reg_write_mem,
@@ -158,6 +162,9 @@ begin
 		pc_add_B <= to_data_type(pc => pc_old_reg);
 		if op.alusrc3 then
 			pc_add_B <= exec_op_reg.readdata1;
+			if fwd_A_do_fwd = '1' then
+				pc_add_B <= fwd_A_val;
+			end if;
 		end if;
 
 		-- New Register Input
@@ -171,7 +178,11 @@ begin
 		memop_out <= mem_op_reg;
 		pc_old_out <= pc_old_reg;
 		pc_new_out <= to_pc_type(data => temp_pc_new_out);
+
 		wrdata <= exec_op_reg.readdata2;
+		if fwd_B_do_fwd = '1' then
+			wrdata <= fwd_B_val;
+		end if;
 
 
 		-- if flush then
