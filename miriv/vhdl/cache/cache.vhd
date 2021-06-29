@@ -92,7 +92,6 @@ architecture impl of cache is
 	signal tag_out_temp_reg, tag_out_temp_reg_next : c_tag_type;
 	signal data_out_temp_reg, data_out_temp_reg_next :  mem_data_type;
 	signal is_dirty_reg, is_dirty_reg_next : std_logic;
-	signal is_tag_diff_reg, is_tag_diff_reg_next : std_logic;
 
 
 	--mgmt signals 
@@ -167,7 +166,6 @@ begin
 			tag_out_temp_reg <= (others => '0');
 			data_out_temp_reg <= (others => '0');
 			is_dirty_reg <= '0';
-			is_tag_diff_reg <= '0';
 
 		elsif rising_edge(clk) then
 			state_reg <= state_reg_next;
@@ -177,7 +175,6 @@ begin
 			tag_out_temp_reg <= tag_out_temp_reg_next;
 			data_out_temp_reg <= data_out_temp_reg_next;
 			is_dirty_reg <= is_dirty_reg_next;
-			is_tag_diff_reg <= is_tag_diff_reg_next;
 		end if;
 
 	end process;
@@ -193,7 +190,6 @@ begin
 		tag_out_temp_reg_next <= tag_out_temp_reg;
 		data_out_temp_reg_next <= data_out_temp_reg;
 		is_dirty_reg_next <= is_dirty_reg;
-		is_tag_diff_reg_next <= is_tag_diff_reg;
 
 		-- mgmt signals
 		mgmt_index <= (others => '0');
@@ -252,10 +248,8 @@ begin
 
 						if mgmt_hit_out and mgmt_valid_out then
 							state_reg_next <= READ_CACHE;
-							is_tag_diff_reg_next <= '0';
 						else
 							state_reg_next <= READ_MEM_START;
-							is_tag_diff_reg_next <= '1';
 						end if;
 					end if;
 
@@ -319,15 +313,7 @@ begin
 						mgmt_tag_in <= mem_out_cpu_reg.address(TAG_SIZE-1+INDEX_SIZE downto INDEX_SIZE);
 						mgmt_index <= mem_out_cpu_reg.address(INDEX_SIZE-1 downto 0);
 
-						if is_dirty_reg and not is_tag_diff_reg then
-
-							-- SET DIRTY
-							mgmt_dirty_in <= '1';
-							state_reg_next <= IDLE;
-							mem_in_cpu <= mem_in_mem;
-							mem_in_cpu.busy <= '0';
-
-						elsif is_dirty_reg and is_tag_diff_reg then
+						if is_dirty_reg then 
 							state_reg_next <= WRITE_BACK_START;
 
 						else

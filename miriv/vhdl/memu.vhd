@@ -45,6 +45,8 @@ begin
 			B <= '0';
 		end if;
 
+		M.address <= A(M.address'length+1 downto 2);
+
 		-- Reading result from memory interface
 		case op.memtype is
 			when MEM_B | MEM_BU=>
@@ -95,7 +97,6 @@ begin
 		-- setting up the output signal for memory interface (read)
 		if op.memread then
 			M.rd <= '1';
-			M.address <= A(M.address'length+1 downto 2);
 			B <= '1';
 
 			case op.memtype is
@@ -126,36 +127,60 @@ begin
 				
 				when others =>
 			end case;  
+		end if;
+
+		-- writing data to memory interface
+		case op.memtype is
+			when MEM_B | MEM_BU =>
+				case byte_address is
+					when "00" =>
+						M.wrdata(31 downto 24) <=  W(7 downto 0);
+						M.wrdata(23 downto 0) <= (others => '-');
+						M.byteena <= "1000";
+					when "01" =>
+						M.wrdata(23 downto 16) <=  W(7 downto 0);
+						M.wrdata(31 downto 24) <= (others => '-');
+						M.wrdata(15 downto 0) <= (others => '-');
+						M.byteena <= "0100";
+					when "10" =>
+						M.wrdata(15 downto 8) <=  W(7 downto 0);
+						M.wrdata(31 downto 16) <= (others => '-');
+						M.wrdata(7 downto 0) <= (others => '-');
+						M.byteena <= "0010";
+					when "11" =>
+						M.wrdata(7 downto 0) <=  W(7 downto 0);
+						M.wrdata(31 downto 8) <= (others => '-');
+						M.byteena <= "0001";
+					when others =>
+				end case;
+
+			when MEM_H | MEM_HU=>
+				case byte_address is
+					when "00" | "01" =>
+						M.wrdata(31 downto 24) <=  W(7 downto 0);
+						M.wrdata(23 downto 16) <=  W(15 downto 8);
+						M.wrdata(15 downto 0) <= (others => '-');
+						M.byteena <= "1100";
+					when "10" | "11"=>
+						M.wrdata(15 downto 8) <=  W(7 downto 0);
+						M.wrdata(7 downto 0) <=  W(15 downto 8);
+						M.wrdata(31 downto 16) <= (others => '-');
+						M.byteena <= "0011";
+					when others =>
+			end case;
+				
+			when MEM_W =>
+				M.wrdata(7 downto 0) <= W(31 downto 24);
+				M.wrdata(15 downto 8) <= W(23 downto 16);
+				M.wrdata(23 downto 16) <= W(15 downto 8);
+				M.wrdata(31 downto 24) <= W(7 downto 0);
+		end case;
 
 		-- setting up the output signal for memory interface (write)
-		elsif op.memwrite then
+		if op.memwrite then
 			M.wr <= '1';
-			M.address <= A(M.address'length+1 downto 2);
 
-			-- writing data to memory interface
 			case op.memtype is
-				when MEM_B | MEM_BU =>
-					case byte_address is
-						when "00" =>
-							M.wrdata(31 downto 24) <=  W(7 downto 0);
-							M.wrdata(23 downto 0) <= (others => '-');
-							M.byteena <= "1000";
-						when "01" =>
-							M.wrdata(23 downto 16) <=  W(7 downto 0);
-							M.wrdata(31 downto 24) <= (others => '-');
-							M.wrdata(15 downto 0) <= (others => '-');
-							M.byteena <= "0100";
-						when "10" =>
-							M.wrdata(15 downto 8) <=  W(7 downto 0);
-							M.wrdata(31 downto 16) <= (others => '-');
-							M.wrdata(7 downto 0) <= (others => '-');
-							M.byteena <= "0010";
-						when "11" =>
-							M.wrdata(7 downto 0) <=  W(7 downto 0);
-							M.wrdata(31 downto 8) <= (others => '-');
-							M.byteena <= "0001";
-						when others =>
-					end case;
 
 				when MEM_H | MEM_HU=>
 					case byte_address is
@@ -164,19 +189,11 @@ begin
 								XS <= '1';
 								M.wr <= '0';
 							end if;
-							M.wrdata(31 downto 24) <=  W(7 downto 0);
-							M.wrdata(23 downto 16) <=  W(15 downto 8);
-							M.wrdata(15 downto 0) <= (others => '-');
-							M.byteena <= "1100";
 						when "10" | "11"=>
 							if byte_address = "11" then
 								XS <= '1';
 								M.wr <= '0';
 							end if;
-							M.wrdata(15 downto 8) <=  W(7 downto 0);
-							M.wrdata(7 downto 0) <=  W(15 downto 8);
-							M.wrdata(31 downto 16) <= (others => '-');
-							M.byteena <= "0011";
 						when others =>
 				end case;
 					
@@ -185,10 +202,8 @@ begin
 						XS <= '1';
 						M.wr <= '0';
 					end if;
-					M.wrdata(7 downto 0) <= W(31 downto 24);
-					M.wrdata(15 downto 8) <= W(23 downto 16);
-					M.wrdata(23 downto 16) <= W(15 downto 8);
-					M.wrdata(31 downto 24) <= W(7 downto 0);
+				
+				when others =>
 			end case;
 		end if;
 
