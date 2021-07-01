@@ -160,7 +160,7 @@ begin
 
 		pc_add_A <= exec_op_reg.imm;
 		pc_add_B <= to_data_type(pc => pc_old_reg);
-		if op.alusrc3 then
+		if exec_op_reg.alusrc3 then
 			pc_add_B <= exec_op_reg.readdata1;
 			if fwd_A_do_fwd = '1' then
 				pc_add_B <= fwd_A_val;
